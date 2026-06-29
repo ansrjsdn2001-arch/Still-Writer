@@ -1,8 +1,10 @@
 .editor-page {
   width: min(100%, 1520px);
+  max-width: 100%;
   min-height: 100vh;
   margin: 0 auto;
   padding: 24px 34px 42px;
+  overflow-x: hidden;
 }
 .editor-header {
   min-height: 58px;
@@ -65,6 +67,8 @@
 
 .editor-shell {
   position: relative;
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(100vh - 238px);
   background: var(--surface-strong);
   border: 1px solid var(--border);
@@ -114,11 +118,15 @@
 }
 
 .editor-content {
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(100vh - 380px);
   padding: 32px;
   color: var(--text);
   background: var(--surface-strong);
   outline: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   white-space: pre-wrap;
 }
 .editor-content:empty::before {
@@ -158,23 +166,6 @@
   color: var(--muted);
   border-left: 3px solid var(--accent);
 }
-.editor-footer {
-  min-height: 78px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 20px;
-  border-top: 1px solid var(--border);
-}
-.editor-footer span {
-  color: var(--accent-strong);
-  font-size: 13px;
-}
-.save-button {
-  min-width: 130px;
-}
-
 .floating-menu {
   position: absolute;
   z-index: 45;
@@ -510,15 +501,36 @@
     box-shadow: none;
   }
   .editor-toolbar {
+    display: grid;
+    grid-template-columns: 54px 1px repeat(8, minmax(0, 1fr)) 48px 32px;
+    align-items: center;
+    overflow-x: hidden;
+    gap: 2px;
     padding-inline: 6px;
   }
   .editor-toolbar__heading {
-    width: 68px;
-    padding-left: 6px;
+    width: 100%;
+    min-width: 0;
+    padding: 0 14px 0 4px;
   }
   .editor-toolbar .icon-button {
-    flex-basis: 38px;
-    width: 38px;
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    padding: 0;
+  }
+  .editor-toolbar__divider {
+    width: 1px;
+    margin: 0;
+  }
+  .editor-toolbar__spacer {
+    display: none;
+  }
+  .count-button {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0 4px;
   }
   .count-button span {
     display: none;
@@ -526,18 +538,6 @@
   .editor-content {
     min-height: calc(100vh - 408px);
     padding: 22px 18px;
-  }
-  .editor-footer {
-    min-height: 68px;
-    position: sticky;
-    bottom: 76px;
-    background: var(--surface-strong);
-  }
-  .editor-footer span {
-    display: none;
-  }
-  .save-button {
-    width: 100%;
   }
   .editor-menu {
     position: fixed;
@@ -578,5 +578,16 @@
   }
   .material-picker__grid > button {
     min-height: 90px;
+  }
+}
+
+@media (max-width: 360px) {
+  .editor-toolbar {
+    grid-template-columns: 50px 1px repeat(8, minmax(0, 1fr)) 44px 30px;
+    gap: 1px;
+    padding-inline: 4px;
+  }
+  .editor-toolbar .icon-button svg {
+    font-size: 20px;
   }
 }

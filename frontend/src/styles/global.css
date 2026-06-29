@@ -1,7 +1,29 @@
+/*
+ * Still Writer 공용 색상표 (color.txt)
+ * 다크 배경: #252628 / 다크 글자: #E8E6E1
+ * 라이트 배경: #F6F1E7 / 라이트 글자: #2C2A27
+ * 포인트: #4F8F88
+ * gray1: #000000, gray2: #222222, gray3: #444444, gray4: #666666
+ * gray5: #888888, gray6: #aaaaaa (취소·닫기 등 실행 취소 버튼)
+ * gray7: #cccccc, gray8: #eeeeee
+ */
 :root {
+  --color-bg-dark: #252628;
+  --color-text-dark: #e8e6e1;
+  --color-bg-light: #f6f1e7;
+  --color-text-light: #2c2a27;
+  --color-point: #4f8f88;
+  --gray1: #000000;
+  --gray2: #222222;
+  --gray3: #444444;
+  --gray4: #666666;
+  --gray5: #888888;
+  --gray6: #aaaaaa;
+  --gray7: #cccccc;
+  --gray8: #eeeeee;
   font-family: Inter, Pretendard, "Noto Sans KR", "Malgun Gothic", sans-serif;
-  color: #2c2a27;
-  background: #f6f1e7;
+  color: var(--color-text-light);
+  background: var(--color-bg-light);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   letter-spacing: 0;
@@ -9,7 +31,7 @@
 
 * { box-sizing: border-box; }
 html, body, #root { min-width: 320px; min-height: 100%; margin: 0; }
-body { min-height: 100vh; }
+body { min-height: 100vh; color: var(--color-text-light); background: var(--color-bg-light); }
 button, input, select { font: inherit; letter-spacing: 0; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible, [contenteditable]:focus-visible { outline: 2px solid #4f8f88; outline-offset: 2px; }

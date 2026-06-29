@@ -3,9 +3,10 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import AppSidebar from './components/layout/AppSidebar';
 import MobileNavigation from './components/layout/MobileNavigation';
 import EditorPage from './pages/EditorPage';
+import Login from './pages/Login';
 import './styles/layout.css';
 
-export default function App() {
+function Workspace() {
   const [theme, setTheme] = useState('light');
   const [activeNav, setActiveNav] = useState('all');
   const toggleTheme = () => {
@@ -35,5 +36,14 @@ export default function App() {
       </main>
       <MobileNavigation activeNav={activeNav} onNavigate={setActiveNav} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/*" element={<Workspace />} />
+    </Routes>
   );
 }

@@ -12,13 +12,12 @@ import WordCountMenu from '../components/editor/WordCountMenu';
 import MaterialPicker from '../components/editor/MaterialPicker';
 import '../styles/editor.css';
 
-const initialText = '비가 그친 뒤의 골목은 유난히 조용했다.\n\n창가에 앉은 주인공은 오래된 편지 한 장을 펼쳤다. 잊고 있던 문장들이 천천히 오늘의 이야기로 돌아왔다.';
 const defaultSettings = { fontSize: 'medium', lineHeight: 'normal', paragraphGap: 'normal' };
 
 export default function EditorPage({ theme, onThemeToggle }) {
   const editorRef = useRef(null);
-  const [title, setTitle] = useState('안개 속의 도시');
-  const [text, setText] = useState(initialText);
+  const [title, setTitle] = useState('');
+  const [text, setText] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [countMenuOpen, setCountMenuOpen] = useState(false);
   const [findOpen, setFindOpen] = useState(false);
@@ -103,9 +102,7 @@ export default function EditorPage({ theme, onThemeToggle }) {
 
       <section className="editor-shell">
         <EditorToolbar onFormat={formatText} charCount={normalizedText.length} countSpaces={countSpaces} onCountMenu={() => { setCountMenuOpen((value) => !value); setMenuOpen(false); }} onMenu={() => { setMenuOpen((value) => !value); setCountMenuOpen(false); }} />
-        <div className={`editor-content editor-content--font-${settings.fontSize} editor-content--line-${settings.lineHeight} editor-content--paragraph-${settings.paragraphGap}`} ref={editorRef} contentEditable suppressContentEditableWarning onInput={syncText}>{initialText}</div>
-        <footer className="editor-footer"><span>{text.trim() ? '자동 저장 완료' : '작성 내용을 입력하세요'}</span><button className="primary-button save-button" type="button" onClick={() => showToast('글을 저장했습니다.')}>저장</button></footer>
-
+        <div className={`editor-content editor-content--font-${settings.fontSize} editor-content--line-${settings.lineHeight} editor-content--paragraph-${settings.paragraphGap}`} ref={editorRef} contentEditable suppressContentEditableWarning onInput={syncText} />
         {countMenuOpen && <WordCountMenu countSpaces={countSpaces} onChange={setCountSpaces} onClose={() => setCountMenuOpen(false)} />}
         {menuOpen && <EditorMenu title={title} onAction={handleMenuAction} />}
       </section>
