@@ -5,23 +5,10 @@ import LockOutlined from "@mui/icons-material/LockOutlined";
 import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import VisibilityOffOutlined from "@mui/icons-material/VisibilityOffOutlined";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
-import stillWriterLogo from "../../logo/logo-transparent.png";
 import "../styles/login.css";
-
-function readStoredUser() {
-  try {
-    const storedUser = window.localStorage.getItem("still-writer-user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  } catch {
-    return null;
-  }
-}
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [currentUser] = useState(readStoredUser);
-  const nickname =
-    typeof currentUser?.nickname === "string" ? currentUser.nickname.trim() : "";
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -30,28 +17,8 @@ export default function Login() {
   return (
     <div
       className="login-page"
-      style={{ "--login-background": 'url("/images/background2.png")' }}
+      style={{ "--login-background": 'url("/images/heroimage.png")' }}
     >
-      <header className="login-header">
-        <Link
-          className="login-header__brand"
-          to="/"
-          aria-label="Still Writer 홈으로 이동"
-        >
-          <img src={stillWriterLogo} alt="Still Writer" />
-        </Link>
-        <nav className="login-header__account" aria-label="계정 메뉴">
-          {nickname ? (
-            <span className="login-header__nickname">{nickname}</span>
-          ) : (
-            <>
-              <Link className="login-header__login" to="/login">로그인</Link>
-              <Link className="login-header__join" to="/join">회원가입</Link>
-            </>
-          )}
-        </nav>
-      </header>
-
       <Link className="login-page__back" to="/" aria-label="이전 페이지로 이동">
         <ArrowBackIosNewRounded />
       </Link>

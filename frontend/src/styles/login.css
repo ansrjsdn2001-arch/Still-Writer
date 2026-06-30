@@ -13,100 +13,30 @@
 .login-page {
   width: 100%;
   min-height: 100dvh;
-  padding: 0;
+  padding: 72px 0 0;
   color: var(--color-text-light);
   background: var(--color-bg-light);
-}
-
-.login-header {
-  position: relative;
-  z-index: 5;
-  min-height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 26px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 0;
-  border-bottom: 1px solid var(--gray8);
-}
-
-.login-header__brand {
-  width: 190px;
-  height: 52px;
-  display: block;
-  overflow: hidden;
-}
-
-.login-header__brand img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  object-position: center;
 }
 
 .login-panel a { color: #33722e; font-weight: 700; text-decoration: none; }
 .login-panel a:hover { text-decoration: underline; }
 
-.login-header__account {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.login-header__account a {
-  min-height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.login-header__login {
-  color: var(--color-text-light);
-  background: #fff;
-  border: 1px solid var(--gray7);
-}
-
-.login-header__login:hover { border-color: var(--color-point); color: var(--color-point); }
-
-.login-header__join {
-  color: #fff;
-  background: var(--color-point);
-  border: 1px solid var(--color-point);
-}
-
-.login-header__join:hover { filter: brightness(0.92); }
-
-.login-header__nickname {
-  max-width: 240px;
-  overflow: hidden;
-  color: var(--color-text-light);
-  font-size: 15px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .login-layout {
-  min-height: calc(100dvh - 64px);
+  min-height: calc(100dvh - 72px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding: 32px;
   overflow: hidden;
   background-color: #fffefa;
-  background-image: var(--login-background);
+  /* 사진 위에 따뜻한 반투명 막을 겹쳐 입력 폼이 배경에 묻히지 않도록 합니다. */
+  background-image:
+    linear-gradient(135deg, rgba(246, 241, 231, 0.3) 0%, rgba(255, 254, 250, 0.12) 52%, rgba(44, 42, 39, 0.08) 100%),
+    var(--login-background);
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: cover;
+  /* 원본 비율을 유지한 cover 방식으로 화면을 빈틈없이 채웁니다. */
+  background-position: center, center 56%;
+  background-size: cover, cover;
   border: 0;
   border-radius: 0;
 }
@@ -115,11 +45,12 @@
   width: min(100% - 64px, 632px);
   margin: auto;
   padding: clamp(44px, 5vw, 72px) clamp(42px, 4vw, 66px);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid var(--gray8);
-  border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(44, 42, 39, 0.08);
-  backdrop-filter: blur(2px);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 12px;
+  /* 반투명 패널 뒤의 사진을 흐리게 처리해 글자와 입력창의 가독성을 확보합니다. */
+  box-shadow: 0 24px 70px rgba(67, 49, 29, 0.2);
+  backdrop-filter: blur(16px) saturate(0.92);
 }
 
 .login-panel__heading { margin-bottom: 38px; text-align: center; }
@@ -342,9 +273,7 @@
 .login-page__back { display: none; }
 
 @media (min-width: 768px) and (max-width: 1100px) {
-  .login-page { padding: 0; }
-  .login-header { display: none; }
-  .login-layout { min-height: 100dvh; padding: 32px; border: 0; border-radius: 0; }
+  .login-layout { min-height: calc(100dvh - 72px); padding: 32px; border: 0; border-radius: 0; }
   .login-panel { width: min(100% - 48px, 590px); padding: 48px 52px; }
 }
 
@@ -352,33 +281,38 @@
   .login-page {
     position: relative;
     min-height: 100dvh;
-    padding: 0;
+    padding: 64px 0 0;
     overflow-x: hidden;
     background-color: #fffefa;
-    background-image: var(--login-background);
+    /* 모바일에서는 세로 화면에 맞는 오버레이와 초점 위치를 따로 사용합니다. */
+    background-image:
+      linear-gradient(180deg, rgba(246, 241, 231, 0.2) 0%, rgba(255, 254, 250, 0.08) 52%, rgba(44, 42, 39, 0.12) 100%),
+      var(--login-background);
     background-repeat: no-repeat;
-    background-position: left bottom;
-    background-size: auto 100%;
+    background-position: center, 53% center;
+    background-size: cover, cover;
   }
-  .login-header { display: none; }
-  .login-page__back { position: absolute; top: 28px; left: 22px; z-index: 4; width: 44px; height: 44px; display: grid; place-items: center; color: var(--gray1); border-radius: 6px; }
+  .login-page__back { position: absolute; top: 76px; left: 12px; z-index: 4; width: 44px; height: 44px; display: grid; place-items: center; color: var(--gray1); border-radius: 6px; }
   .login-page__back svg { font-size: 24px; }
-  .login-layout { min-height: 100dvh; padding: 88px 0 48px; overflow: visible; border: 0; border-radius: 0; background: transparent; }
-  .login-panel { position: relative; z-index: 2; width: calc(100% - 32px); margin: 0 auto; padding: 42px clamp(24px, 7vw, 46px) 38px; border-color: var(--gray8); box-shadow: none; backdrop-filter: blur(4px); }
-  .login-panel__heading { margin-bottom: 32px; }
-  .login-panel__heading h1 { font-size: 30px; }
+  .login-layout { min-height: calc(100dvh - 64px); padding: 72px 0 36px; overflow: visible; border: 0; border-radius: 0; background: transparent; }
+  /* 767px 화면에서도 폼이 과도하게 넓어지지 않도록 모바일 최대 너비를 제한합니다. */
+  .login-panel { position: relative; z-index: 2; width: min(calc(100% - 32px), 460px); margin: 0 auto; padding: 32px 28px 30px; background: rgba(255, 255, 255, 0.84); border-color: rgba(255, 255, 255, 0.74); box-shadow: 0 16px 40px rgba(67, 49, 29, 0.16); backdrop-filter: blur(10px) saturate(0.94); }
+  .login-panel__heading { margin-bottom: 26px; }
+  .login-panel__heading h1 { font-size: 28px; }
   .login-panel__heading p { font-size: 14px; line-height: 1.5; }
-  .login-field { min-height: 58px; }
+  .login-form { gap: 12px; }
+  .login-field { min-height: 52px; padding-inline: 15px; }
   .login-form__options { font-size: 13px; }
   .login-checkbox { gap: 8px; }
   .login-checkbox input { width: 19px; height: 19px; }
-  .login-submit { min-height: 56px; }
+  .login-submit { min-height: 52px; }
   .login-socials .gsi-material-button,
-  .kakao-material-button { height: 56px; }
-  .login-panel__join { margin-top: 34px; line-height: 1.5; }
+  .kakao-material-button { height: 52px; }
+  .login-divider { margin-block: 20px; }
+  .login-panel__join { margin-top: 26px; line-height: 1.5; }
 }
 
 @media (max-width: 420px) {
-  .login-panel { width: calc(100% - 24px); padding-inline: 20px; }
+  .login-panel { width: calc(100% - 24px); padding: 30px 20px 28px; }
   .login-form__options { gap: 10px; font-size: 12px; }
 }
