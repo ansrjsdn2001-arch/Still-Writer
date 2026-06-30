@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: still-writer-backend
+
+server:
+  port: ${PORT:8080}
+
