@@ -11,11 +11,17 @@
 }
 
 .login-page {
+  --login-background: var(--login-background-light);
   width: 100%;
   min-height: 100dvh;
   padding: 72px 0 0;
   color: var(--color-text-light);
   background: var(--color-bg-light);
+}
+
+/* 앱 테마가 다크 모드일 때 로그인 화면 전용 이미지만 교체합니다. */
+[data-theme="dark"] .login-page {
+  --login-background: var(--login-background-dark);
 }
 
 .login-panel a { color: #33722e; font-weight: 700; text-decoration: none; }

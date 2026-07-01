@@ -4,6 +4,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
+import WriteActionButton from "../components/common/WriteActionButton";
 import "../styles/home.css";
 
 /**
@@ -19,7 +20,10 @@ export default function HomePage({ currentUser }) {
         <section
           className="home-hero"
           aria-labelledby="home-title"
-          style={{ "--home-hero-image": 'url("/images/heroimage.png")' }}
+          style={{
+            "--home-hero-image-light": 'url("/images/heroimage(light).png")',
+            "--home-hero-image-dark": 'url("/images/heroimage(dark).png")',
+          }}
         >
           <div className="home-hero__content">
             <h1 id="home-title">
@@ -65,6 +69,7 @@ export default function HomePage({ currentUser }) {
         >
           <header className="home-card__header">
             <h2 id="recent-writing-title">최근 작성한 글</h2>
+            <WriteActionButton />
           </header>
           <div className="home-empty-state">
             <DescriptionOutlinedIcon aria-hidden="true" />

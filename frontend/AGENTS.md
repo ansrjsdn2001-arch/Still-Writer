@@ -91,6 +91,7 @@ frontend/src/
 ```text
 /           메인 페이지
 /writings   모든 글 페이지
+/write      글 작성 페이지
 /profile    프로필 설정 안내 화면
 /login      로그인 UI
 기타 경로    /로 이동
@@ -98,8 +99,7 @@ frontend/src/
 
 - `/join` 링크가 있지만 `Join.jsx`는 비어 있고 라우트가 등록되지 않았다.
 - `/find-password` 링크가 있지만 페이지와 라우트가 없다.
-- 글 작성 메뉴는 사이드바에 존재하지만 글쓰기 페이지와 라우트는 사용자 요청으로 삭제된 상태다.
-- 사용자 요청 없이 삭제된 에디터 화면을 임의로 복원하지 않는다.
+- 글 작성 페이지는 제목·본문·기본 서식·글자 수 UI가 구현되어 있으며 실제 저장 API는 아직 연결되지 않았다.
 
 ### 4-3. 공용 레이아웃
 
@@ -234,7 +234,7 @@ frontend/src/
 현재 주요 이미지:
 
 ```text
-public/images/heroimage.png
+public/images/heroimage(light).png
 public/images/background2.png
 public/images/still-writer-logo.png
 ```

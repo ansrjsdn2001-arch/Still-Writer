@@ -96,6 +96,24 @@ button:focus-visible, input:focus-visible, select:focus-visible, [contenteditabl
 .secondary-button:hover { border-color: var(--accent); color: var(--accent-strong); }
 .primary-button svg, .secondary-button svg { font-size: 20px; }
 
+.write-action-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  color: #fff;
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  border-radius: 7px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.write-action-button:hover { filter: brightness(1.08); }
+.write-action-button svg { font-size: 20px; }
+
 .brand-logo { position: relative; width: 100%; max-width: 216px; height: 50px; min-height: 50px; flex: 0 0 50px; overflow: hidden; }
 .brand-logo__image { position: absolute; top: 50%; left: -24.4%; width: 146%; max-width: none; height: auto; transform: translateY(-50%); mix-blend-mode: multiply; }
 [data-theme='dark'] .brand-logo__image { filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }

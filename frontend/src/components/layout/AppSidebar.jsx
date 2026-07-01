@@ -1,5 +1,4 @@
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import ViewListOutlinedIcon from '@mui/icons-material/ViewListOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
@@ -9,7 +8,6 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 const primaryItems = [
   { id: 'home', label: '홈', Icon: HomeOutlinedIcon },
-  { id: 'write', label: '글 작성', Icon: EditOutlinedIcon },
   { id: 'all', label: '모든 글', Icon: ViewListOutlinedIcon },
   { id: 'materials', label: '소재 보관함', Icon: CollectionsBookmarkOutlinedIcon },
   { id: 'favorites', label: '즐겨찾기', Icon: StarBorderOutlinedIcon },

@@ -1,5 +1,6 @@
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CollectionsBookmarkOutlinedIcon from '@mui/icons-material/CollectionsBookmarkOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
@@ -8,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const baseItems = [
   { id: 'home', label: '홈', Icon: HomeOutlinedIcon },
   { id: 'all', label: '글', Icon: ArticleOutlinedIcon },
+  { id: 'write', label: '글 작성', Icon: EditOutlinedIcon, primary: true, path: '/write' },
   { id: 'materials', label: '소재', Icon: CollectionsBookmarkOutlinedIcon },
 ];
 

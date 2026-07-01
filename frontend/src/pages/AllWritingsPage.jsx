@@ -2,6 +2,7 @@ import { useState } from "react";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import WriteActionButton from "../components/common/WriteActionButton";
 import "../styles/writings.css";
 
 const tabs = [
@@ -78,6 +79,8 @@ export default function AllWritingsPage() {
             <option value="title-asc">제목 가나다순</option>
           </select>
         </label>
+
+        <WriteActionButton />
       </section>
 
       <section className="writings-list" aria-label="글 목록" aria-live="polite">

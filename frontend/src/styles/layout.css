@@ -1,4 +1,23 @@
-.app { min-height: 100vh; color: var(--text); background: var(--bg); transition: color 160ms ease, background 160ms ease; }
+.app { min-height: 100vh; color: var(--text); background: var(--bg); }
+
+/* 테마 변경 중에만 모든 화면의 테마 색상을 같은 속도로 부드럽게 전환합니다. */
+.app.is-theme-transitioning,
+.app.is-theme-transitioning *,
+.app.is-theme-transitioning *::before,
+.app.is-theme-transitioning *::after {
+  transition-property: color, background-color, border-color, box-shadow, fill, stroke !important;
+  transition-duration: 220ms !important;
+  transition-timing-function: ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app.is-theme-transitioning,
+  .app.is-theme-transitioning *,
+  .app.is-theme-transitioning *::before,
+  .app.is-theme-transitioning *::after {
+    transition-duration: 0ms !important;
+  }
+}
 .app__main { min-height: 100vh; margin-left: 272px; padding-top: 72px; }
 
 .app-header { position: fixed; inset: 0 0 auto; z-index: 90; height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 28px; color: var(--text); background: color-mix(in srgb, var(--surface-strong) 94%, transparent); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); }
@@ -62,9 +81,10 @@
   .sidebar { display: none; }
   .app__main { min-height: calc(100vh - 76px); margin-left: 0; padding-top: 64px; padding-bottom: 76px; }
   .profile-settings-page { min-height: calc(100vh - 140px); padding: 28px 20px; }
-  .mobile-nav { position: fixed; inset: auto 0 0 0; z-index: 80; height: 76px; display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); background: var(--surface-strong); border-top: 1px solid var(--border); }
+  .mobile-nav { position: fixed; inset: auto 0 0 0; z-index: 80; height: 76px; display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); background: var(--surface-strong); border-top: 1px solid var(--border); }
   .mobile-nav__item { min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; color: var(--muted); background: transparent; font-size: 11px; cursor: pointer; }
   .mobile-nav__icon { width: 34px; height: 32px; display: grid; place-items: center; border-radius: 8px; }
   .mobile-nav__item svg { font-size: 23px; }
   .mobile-nav__item.is-active { color: var(--accent-strong); }
+  .mobile-nav__item.is-primary .mobile-nav__icon { width: 48px; height: 48px; margin-top: -22px; color: #fff; background: var(--accent-strong); box-shadow: 0 5px 14px rgba(40, 121, 111, 0.28); }
 }

@@ -88,6 +88,7 @@ frontend/src/main.jsx
 |---|---|---|
 | `/` | `HomePage` | UI 완료, API 미연동 |
 | `/writings` | `AllWritingsPage` | 검색·정렬·빈 상태 UI, API 미연동 |
+| `/write` | `WritePage` | 입력·기본 서식·글자 수 UI 완료, 저장 API 미연동 |
 | `/profile` | `ProfileSettingsPage` | 안내용 화면, 폼·API 미구현 |
 | `/login` | `Login` | UI만 구현, 실제 로그인 미구현 |
 | 기타 경로 | `/`로 이동 | 임시 처리 |
@@ -136,7 +137,6 @@ still-writer-theme
 
 ```text
 홈
-글 작성
 모든 글
 소재 보관함
 즐겨찾기
@@ -149,11 +149,8 @@ still-writer-theme
 
 - 홈: `/` 연결
 - 모든 글: `/writings` 연결
-- 글 작성: 메뉴만 존재하며 페이지와 라우트 없음
 - 소재 보관함·즐겨찾기·휴지통·설정: 메뉴만 존재하며 페이지와 라우트 없음
 - 내 폴더: 실제 데이터가 없어 빈 상태 표시
-
-글쓰기 페이지와 전용 에디터 컴포넌트는 사용자 요청으로 삭제된 상태입니다. 사용자 요구 없이 기존 에디터 화면을 복원하지 않습니다.
 
 ### 모바일 하단 내비게이션
 
@@ -161,10 +158,30 @@ still-writer-theme
 
 - 홈
 - 글
+- 중앙 글 작성: `/write` 연결
 - 소재
 - 로그인 시 프로필 / 비로그인 시 설정
 
 모바일에서는 프로필 설정을 헤더가 아닌 하단 내비게이션으로 접근하도록 설계했습니다.
+
+### 글 작성 페이지
+
+파일:
+
+- `frontend/src/pages/WritePage.jsx`
+- `frontend/src/styles/write.css`
+
+구현 내용:
+
+- 제목 입력과 50자 제한
+- 본문 `contentEditable` 편집
+- 제목 단계·굵게·기울임·밑줄·목록 기본 서식과 큰따옴표·작은따옴표 삽입
+- 공백 포함·제외 글자 수 계산
+- 되돌리기·다시 실행·타임스탬프 메뉴
+- 붙여넣기 시 일반 텍스트만 허용
+- 저장 API에 전달할 제목, HTML, 일반 텍스트, 글자 수 payload 준비
+
+실제 문서 저장 API는 아직 없으므로 서버 저장은 수행하지 않습니다.
 
 ### 메인 페이지
 
@@ -186,7 +203,7 @@ still-writer-theme
 히어로 이미지는 다음 파일을 사용합니다.
 
 ```text
-frontend/public/images/heroimage.png
+frontend/public/images/heroimage(light).png
 ```
 
 히어로 배경은 `cover`로 표시하고 오른쪽 세로 위치를 `58%`로 조정해 커피잔과 받침이 보이도록 했습니다. 왼쪽에는 콘텐츠 가독성을 위한 배경색 그라데이션을 겹쳤습니다.
@@ -222,7 +239,7 @@ frontend/public/images/heroimage.png
 - 카카오·Google 로그인 UI
 - 반응형 로그인 패널
 
-배경은 `frontend/public/images/heroimage.png`를 사용합니다. 사진을 `cover`로 채우고 따뜻한 오버레이를 겹쳤으며, 로그인 패널에는 반투명 배경과 `backdrop-filter`를 적용했습니다.
+라이트 모드 배경은 `frontend/public/images/heroimage(light).png`, 다크 모드 배경은 `frontend/public/images/heroimage(dark).png`를 사용합니다. 사진을 `cover`로 채우고 오버레이를 겹쳤으며, 로그인 패널에는 반투명 배경과 `backdrop-filter`를 적용했습니다.
 
 모바일 `767px` 이하에서는 다음 기준을 사용합니다.
 
@@ -276,7 +293,8 @@ frontend/
 ├── public/
 │   └── images/
 │       ├── background2.png
-│       ├── heroimage.png
+│       ├── heroimage(light).png
+│       ├── heroimage(dark).png
 │       └── still-writer-logo.png
 └── src/
     ├── main.jsx
@@ -334,7 +352,7 @@ AGENTS.md
 - 회원가입 페이지와 `/join` 라우트
 - 비밀번호 찾기 페이지와 `/find-password` 라우트
 - 프로필 수정 폼과 API
-- 글 작성 페이지
+- 글 저장 API와 자동 저장
 - 글 목록 API, 실제 검색·정렬
 - 폴더 목록·상세·생성
 - 소재 보관함

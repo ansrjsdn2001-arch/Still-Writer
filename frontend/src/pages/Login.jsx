@@ -17,7 +17,10 @@ export default function Login() {
   return (
     <div
       className="login-page"
-      style={{ "--login-background": 'url("/images/heroimage.png")' }}
+      style={{
+        "--login-background-light": 'url("/images/heroimage(light).png")',
+        "--login-background-dark": 'url("/images/heroimage(dark).png")',
+      }}
     >
       <Link className="login-page__back" to="/" aria-label="이전 페이지로 이동">
         <ArrowBackIosNewRounded />

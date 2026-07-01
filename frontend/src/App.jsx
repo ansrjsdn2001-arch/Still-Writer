@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import AppHeader from './components/layout/AppHeader';
 import AppSidebar from './components/layout/AppSidebar';
@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import AllWritingsPage from './pages/AllWritingsPage';
 import Login from './pages/Login';
 import ProfileSettingsPage from './pages/ProfileSettingsPage';
+import WritePage from './pages/WritePage';
 import './styles/layout.css';
 
 function readStoredUser() {
@@ -31,7 +32,9 @@ function Workspace({ currentUser }) {
     ? 'home'
     : location.pathname === '/writings'
       ? 'all'
-    : location.pathname === '/profile'
+    : location.pathname === '/write'
+        ? 'write'
+      : location.pathname === '/profile'
         ? 'profile'
         : selectedNav;
 
@@ -39,6 +42,7 @@ function Workspace({ currentUser }) {
     setSelectedNav(navigationId);
     if (navigationId === 'home') navigate('/');
     if (navigationId === 'all') navigate('/writings');
+    if (navigationId === 'write') navigate('/write');
   };
 
   return (
@@ -48,6 +52,7 @@ function Workspace({ currentUser }) {
         <Routes>
           <Route path="/" element={<HomePage currentUser={currentUser} />} />
           <Route path="/writings" element={<AllWritingsPage />} />
+          <Route path="/write" element={<WritePage />} />
           <Route path="/profile" element={<ProfileSettingsPage currentUser={currentUser} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -59,9 +64,19 @@ function Workspace({ currentUser }) {
 
 export default function App() {
   const [theme, setTheme] = useState(readStoredTheme);
+  const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
+  const themeTransitionTimerRef = useRef(null);
   const [currentUser, setCurrentUser] = useState(readStoredUser);
 
+  useEffect(() => () => window.clearTimeout(themeTransitionTimerRef.current), []);
+
   const toggleTheme = () => {
+    // 테마가 전환되는 짧은 시간에만 전역 색상 애니메이션을 활성화합니다.
+    setIsThemeTransitioning(true);
+    window.clearTimeout(themeTransitionTimerRef.current);
+    themeTransitionTimerRef.current = window.setTimeout(() => {
+      setIsThemeTransitioning(false);
+    }, 240);
     setTheme((current) => {
       const nextTheme = current === 'light' ? 'dark' : 'light';
       window.localStorage.setItem('still-writer-theme', nextTheme);
@@ -75,7 +90,7 @@ export default function App() {
   };
 
   return (
-    <div className="app" data-theme={theme}>
+    <div className={`app${isThemeTransitioning ? ' is-theme-transitioning' : ''}`} data-theme={theme}>
       <AppHeader
         currentUser={currentUser}
         theme={theme}

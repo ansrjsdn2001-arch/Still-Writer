@@ -17,6 +17,7 @@
 }
 
 .home-hero {
+  --home-hero-image: var(--home-hero-image-light);
   grid-area: hero;
   position: relative;
   min-height: 220px;
@@ -35,6 +36,11 @@
   border-radius: 10px;
 }
 
+/* 히어로 이미지를 사용하는 화면은 앱 테마와 동일한 이미지 세트를 공유합니다. */
+[data-theme="dark"] .home-hero {
+  --home-hero-image: var(--home-hero-image-dark);
+}
+
 .home-hero__content { position: relative; z-index: 1; max-width: 58%; }
 .home-hero h1 { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--text); font-size: clamp(27px, 2.4vw, 38px); line-height: 1.25; letter-spacing: -0.035em; }
 .home-hero h1 span { font-size: 0.86em; }
@@ -50,6 +56,7 @@
 
 .home-card__header { min-height: 28px; display: flex; align-items: center; justify-content: space-between; }
 .home-card__header h2 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
+.home-card__header .write-action-button { min-height: 36px; padding-inline: 12px; font-size: 13px; }
 .home-card__more { min-height: 32px; display: inline-flex; align-items: center; gap: 2px; padding: 0 4px 0 10px; color: var(--muted); background: transparent; border: 0; border-radius: 6px; font-size: 13px; cursor: pointer; }
 .home-card__more:hover { color: var(--accent-strong); background: var(--accent-soft); }
 .home-card__more svg { font-size: 19px; }
