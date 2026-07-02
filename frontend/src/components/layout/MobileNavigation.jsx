@@ -3,7 +3,6 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CollectionsBookmarkOutlinedIcon from '@mui/icons-material/CollectionsBookmarkOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import { useNavigate } from 'react-router-dom';
 
 const baseItems = [
@@ -13,14 +12,9 @@ const baseItems = [
   { id: 'materials', label: '소재', Icon: CollectionsBookmarkOutlinedIcon },
 ];
 
-export default function MobileNavigation({ activeNav, onNavigate, currentUser }) {
+export default function MobileNavigation({ activeNav, onNavigate }) {
   const navigate = useNavigate();
-  const items = [
-    ...baseItems,
-    currentUser
-      ? { id: 'profile', label: '프로필', Icon: ManageAccountsOutlinedIcon, path: '/profile' }
-      : { id: 'settings', label: '설정', Icon: SettingsOutlinedIcon },
-  ];
+  const items = [...baseItems, { id: 'settings', label: '설정', Icon: SettingsOutlinedIcon }];
 
   const handleNavigate = (item) => {
     onNavigate(item.id);

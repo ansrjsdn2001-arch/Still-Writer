@@ -1,24 +1,11 @@
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import ViewListOutlinedIcon from '@mui/icons-material/ViewListOutlined';
-import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import CollectionsBookmarkOutlinedIcon from '@mui/icons-material/CollectionsBookmarkOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-
-const primaryItems = [
-  { id: 'home', label: '홈', Icon: HomeOutlinedIcon },
-  { id: 'all', label: '모든 글', Icon: ViewListOutlinedIcon },
-  { id: 'materials', label: '소재 보관함', Icon: CollectionsBookmarkOutlinedIcon },
-  { id: 'favorites', label: '즐겨찾기', Icon: StarBorderOutlinedIcon },
-  { id: 'trash', label: '휴지통', Icon: DeleteOutlineOutlinedIcon },
-];
+import { primaryNavigationItems, settingsNavigationItem } from './navigationItems';
 
 export default function AppSidebar({ activeNav, onNavigate }) {
   return (
     <aside className="sidebar">
       <nav className="sidebar__nav" aria-label="주요 메뉴">
-        {primaryItems.map(({ id, label, Icon }) => (
+        {primaryNavigationItems.map(({ id, label, Icon }) => (
           <button key={id} className={`sidebar-link${activeNav === id ? ' is-active' : ''}`} onClick={() => onNavigate(id)}>
             <Icon /><span>{label}</span>
           </button>
@@ -34,8 +21,8 @@ export default function AppSidebar({ activeNav, onNavigate }) {
       </section>
 
       <nav className="sidebar__utility" aria-label="보조 메뉴">
-        <button className={`sidebar-link${activeNav === 'settings' ? ' is-active' : ''}`} onClick={() => onNavigate('settings')}>
-          <SettingsOutlinedIcon /><span>설정</span>
+        <button className={`sidebar-link${activeNav === settingsNavigationItem.id ? ' is-active' : ''}`} onClick={() => onNavigate(settingsNavigationItem.id)}>
+          <settingsNavigationItem.Icon /><span>{settingsNavigationItem.label}</span>
         </button>
       </nav>
     </aside>

@@ -1,9 +1,7 @@
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
-import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import WriteActionButton from "../components/common/WriteActionButton";
 import "../styles/home.css";
 
@@ -43,17 +41,14 @@ export default function HomePage({ currentUser }) {
           </header>
           <div className="home-record__grid">
             <div className="home-record__item">
-              <DescriptionOutlinedIcon aria-hidden="true" />
               <span>작성 글자 수</span>
               <strong aria-label="기록 없음">-</strong>
             </div>
             <div className="home-record__item">
-              <CalendarMonthOutlinedIcon aria-hidden="true" />
               <span>연속 작성일</span>
               <strong aria-label="기록 없음">-</strong>
             </div>
             <div className="home-record__item">
-              <TrackChangesOutlinedIcon aria-hidden="true" />
               <span>목표 달성률</span>
               <strong aria-label="기록 없음">-</strong>
             </div>

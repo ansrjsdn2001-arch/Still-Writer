@@ -7,7 +7,7 @@
 
 .home-layout {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(310px, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(480px, 1fr);
   grid-template-areas:
     'hero record'
     'recent activity'
@@ -62,11 +62,10 @@
 .home-card__more svg { font-size: 19px; }
 
 .home-record { grid-area: record; }
-.home-record__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
-.home-record__item { min-width: 0; min-height: 112px; display: grid; grid-template-columns: auto 1fr; align-content: center; gap: 7px 8px; padding: 14px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
-.home-record__item svg { color: var(--accent-strong); font-size: 20px; }
-.home-record__item span { overflow: hidden; color: var(--muted); font-size: 12px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.home-record__item strong { grid-column: 1 / -1; color: var(--text); font-size: 25px; }
+.home-record__grid { display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: 10px; margin-top: 14px; }
+.home-record__item { min-width: 140px; min-height: 112px; display: grid; align-content: center; gap: 7px; padding: 14px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+.home-record__item span { color: var(--muted); font-size: 12px; font-weight: 700; line-height: 1.4; white-space: nowrap; }
+.home-record__item strong { color: var(--text); font-size: 25px; }
 .home-card__empty-message { margin: 12px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
 
 .home-recent { grid-area: recent; }
@@ -86,14 +85,17 @@
 .home-folder-empty strong { color: var(--text); font-size: 15px; }
 .home-folder-empty span { margin-top: 6px; font-size: 13px; line-height: 1.45; }
 
-@media (min-width: 768px) and (max-width: 1200px) {
+@media (min-width: 768px) and (max-width: 1199px) {
   .home-page { padding: 20px 22px 36px; }
-  .home-layout { grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); gap: 14px; }
+  .home-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'hero' 'recent' 'folders' 'record' 'activity';
+    gap: 14px;
+  }
   .home-hero { min-height: 210px; padding: 28px; }
   .home-record__grid { gap: 6px; }
   .home-record__item { padding-inline: 8px; }
-  .home-record__item svg { display: none; }
-  .home-record__item span, .home-record__item strong { grid-column: 1 / -1; }
+  .home-empty-state--side { min-height: 224px; }
 }
 
 @media (max-width: 767px) {

@@ -1,0 +1,61 @@
+.materials-page { width: min(100%, 1540px); min-height: calc(100vh - 72px); margin: 0 auto; padding: 38px clamp(28px, 4vw, 54px) 50px; }
+.materials-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; }
+.materials-heading h1 { margin: 0; color: var(--text); font-size: 36px; letter-spacing: -0.04em; }
+.materials-heading p { margin: 10px 0 0; color: var(--accent-strong); font-size: 16px; }
+.materials-heading__actions { display: flex; align-items: center; gap: 12px; }
+.materials-search { width: min(30vw, 310px); }
+.materials-add-button { min-width: 132px; min-height: 54px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; color: #fff; background: var(--accent-strong); border: 1px solid var(--accent-strong); border-radius: 9px; font-weight: 800; cursor: pointer; }
+.materials-categories { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.materials-categories button { min-height: 44px; padding: 0 22px; color: var(--muted); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
+.materials-categories button.is-active { color: var(--accent-strong); background: var(--accent-soft); border-color: transparent; font-weight: 800; }
+.materials-controls { display: grid; grid-template-columns: minmax(0, 1fr) 124px; gap: 14px; margin-top: 18px; }
+.materials-sort, .materials-filter-button { min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 16px; color: var(--muted); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 9px; }
+.materials-sort select { min-width: 0; width: 100%; height: 48px; color: var(--text); background: transparent; border: 0; outline: 0; cursor: pointer; }
+.materials-filter-button { justify-content: center; color: var(--text); cursor: pointer; }
+.materials-list { margin-top: 18px; }
+.materials-empty { min-height: 360px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: var(--muted); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 10px; text-align: center; }
+.materials-empty > span { width: 68px; height: 68px; display: grid; place-items: center; margin-bottom: 16px; color: var(--accent-strong); background: var(--accent-soft); border-radius: 16px; }
+.materials-empty > span svg { font-size: 36px; }
+.materials-empty strong { color: var(--text); font-size: 18px; }
+.materials-empty p { margin: 9px 0 18px; font-size: 14px; }
+.materials-empty button { min-height: 42px; display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; color: #fff; background: var(--accent-strong); border: 0; border-radius: 7px; cursor: pointer; }
+.materials-guide { min-height: 50px; display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 0 16px; color: var(--muted); background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface-strong)); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+.materials-guide svg { color: var(--accent-strong); }
+.materials-status { min-height: 22px; margin: 10px 2px 0; color: var(--muted); font-size: 13px; }
+.materials-dialog-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; background: rgba(18, 24, 26, 0.48); }
+.materials-dialog { width: min(100%, 500px); color: var(--text); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+.materials-dialog header { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border); }
+.materials-dialog h2, .materials-dialog p { margin: 0; }
+.materials-dialog p { margin-top: 6px; color: var(--muted); font-size: 13px; }
+.materials-dialog header button { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text); background: transparent; border: 0; border-radius: 7px; cursor: pointer; }
+.materials-dialog__options { display: grid; gap: 8px; padding: 14px; }
+.materials-dialog__options > button { min-height: 72px; display: grid; grid-template-columns: 42px 1fr; align-items: center; gap: 12px; padding: 10px 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; text-align: left; cursor: pointer; }
+.materials-dialog__options > button:hover { border-color: var(--accent); background: var(--accent-soft); }
+.materials-dialog__options > button > svg { color: var(--accent-strong); font-size: 28px; }
+.materials-dialog__options strong, .materials-dialog__options small { display: block; }
+.materials-dialog__options small { margin-top: 4px; color: var(--muted); }
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .materials-page { padding: 34px 28px 46px; }
+  .materials-heading h1 { font-size: 32px; }
+}
+
+@media (max-width: 767px) {
+  .materials-page { min-height: calc(100vh - 140px); padding: 28px 16px 30px; }
+  .materials-heading { display: block; }
+  .materials-heading h1 { font-size: 31px; }
+  .materials-heading p { font-size: 14px; }
+  .materials-heading__actions { margin-top: 20px; }
+  .materials-search { width: auto; flex: 1; }
+  .materials-add-button { min-width: 50px; width: 50px; padding: 0; }
+  .materials-add-button span { display: none; }
+  .materials-categories { flex-wrap: nowrap; gap: 8px; margin-top: 22px; overflow-x: auto; scrollbar-width: none; }
+  .materials-categories::-webkit-scrollbar { display: none; }
+  .materials-categories button { min-width: max-content; padding-inline: 18px; }
+  .materials-controls { grid-template-columns: minmax(0, 1fr) 100px; gap: 8px; }
+  .materials-sort, .materials-filter-button { gap: 7px; padding-inline: 10px; }
+  .materials-empty { min-height: 300px; padding: 26px 18px; }
+  .materials-guide { align-items: flex-start; padding-block: 12px; line-height: 1.5; }
+  .materials-dialog-backdrop { align-items: end; padding: 0; }
+  .materials-dialog { border-right: 0; border-bottom: 0; border-left: 0; border-radius: 14px 14px 0 0; }
+}

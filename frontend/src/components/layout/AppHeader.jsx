@@ -4,6 +4,7 @@ import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import { Link, useNavigate } from 'react-router-dom';
 import BrandLogo from '../common/BrandLogo';
 
@@ -11,7 +12,7 @@ import BrandLogo from '../common/BrandLogo';
  * 모든 화면에서 로고, 테마, 로그인 상태별 계정 기능을 일관되게 제공합니다.
  * 모바일 로그인 상태에서는 프로필 메뉴를 숨기고 하단 내비게이션으로 분리합니다.
  */
-export default function AppHeader({ currentUser, theme, onThemeToggle, onLogout }) {
+export default function AppHeader({ currentUser, theme, showMobileMenu, onMobileMenuOpen, onThemeToggle, onLogout }) {
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef(null);
   const navigate = useNavigate();
@@ -45,8 +46,16 @@ export default function AppHeader({ currentUser, theme, onThemeToggle, onLogout 
 
   return (
     <header className="app-header">
+      {showMobileMenu && (
+        <button className="app-header__mobile-menu" type="button" onClick={onMobileMenuOpen} aria-label="전체 메뉴 열기" aria-haspopup="dialog">
+          <MenuRoundedIcon />
+        </button>
+      )}
       <Link className="app-header__brand" to="/" aria-label="Still Writer 메인 페이지로 이동">
         <BrandLogo />
+        <span className="app-header__mobile-wordmark-frame">
+          <img className="app-header__mobile-wordmark" src="/images/still-writer-wordmark-centered.png" alt="Still Writer" />
+        </span>
       </Link>
 
       <div className="app-header__actions">

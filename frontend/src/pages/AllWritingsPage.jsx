@@ -43,14 +43,16 @@ export default function AllWritingsPage() {
         <p>지금까지 작성한 모든 글을 관리하고 찾아보세요.</p>
       </header>
 
-      <nav className="writings-tabs" aria-label="글 보기 방식">
+      <nav className="writings-tabs" role="tablist" aria-label="글 보기 방식">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             className={activeTab === tab.id ? "is-active" : ""}
             type="button"
+            role="tab"
             onClick={() => setActiveTab(tab.id)}
-            aria-current={activeTab === tab.id ? "page" : undefined}
+            aria-selected={activeTab === tab.id}
+            aria-controls="writings-list-panel"
           >
             {tab.label}
           </button>
@@ -83,7 +85,7 @@ export default function AllWritingsPage() {
         <WriteActionButton />
       </section>
 
-      <section className="writings-list" aria-label="글 목록" aria-live="polite">
+      <section id="writings-list-panel" className="writings-list" role="tabpanel" aria-label="글 목록" aria-live="polite">
         {visibleWritings.length === 0 && (
           <div className="writings-empty">
             <span className="writings-empty__icon" aria-hidden="true">
