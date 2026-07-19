@@ -1,0 +1,21 @@
+# 로컬 환경 변수와 비밀정보
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# 백엔드 빌드 결과
+backend/target/
+
+# 프론트엔드 의존성과 빌드 결과
+frontend/node_modules/
+frontend/dist/
+
+# IDE 및 운영체제 파일
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

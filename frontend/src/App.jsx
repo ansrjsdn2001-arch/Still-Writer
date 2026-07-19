@@ -10,13 +10,15 @@ import FavoritesPage from './pages/FavoritesPage';
 import MaterialsPage from './pages/MaterialsPage';
 import TrashPage from './pages/TrashPage';
 import Login from './pages/Login';
+import Join from './pages/Join';
+import GoogleOAuthCallback from './pages/GoogleOAuthCallback';
 import ProfileSettingsPage from './pages/ProfileSettingsPage';
 import WritePage from './pages/WritePage';
 import './styles/layout.css';
 
 function readStoredUser() {
   try {
-    const storedUser = window.localStorage.getItem('still-writer-user');
+    const storedUser = window.sessionStorage.getItem('still-writer-user') ?? window.localStorage.getItem('still-writer-user');
     return storedUser ? JSON.parse(storedUser) : null;
   } catch {
     return null;
@@ -108,7 +110,18 @@ export default function App() {
 
   const handleLogout = () => {
     window.localStorage.removeItem('still-writer-user');
+    window.sessionStorage.removeItem('still-writer-user');
+    window.sessionStorage.removeItem('still-writer-access-token');
     setCurrentUser(null);
+  };
+
+  const handleLogin = (loginUser) => {
+    const storage = loginUser.keepSignedIn ? window.localStorage : window.sessionStorage;
+    const otherStorage = loginUser.keepSignedIn ? window.sessionStorage : window.localStorage;
+
+    otherStorage.removeItem('still-writer-user');
+    storage.setItem('still-writer-user', JSON.stringify(loginUser));
+    setCurrentUser(loginUser);
   };
 
   return (
@@ -116,13 +129,15 @@ export default function App() {
       <AppHeader
         currentUser={currentUser}
         theme={theme}
-        showMobileMenu={location.pathname !== '/login'}
+        showMobileMenu={!['/login', '/join', '/oauth/google/callback'].includes(location.pathname)}
         onMobileMenuOpen={() => setIsMobileMenuOpen(true)}
         onThemeToggle={toggleTheme}
         onLogout={handleLogout}
       />
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/oauth/google/callback" element={<GoogleOAuthCallback onLogin={handleLogin} />} />
+        <Route path="/join" element={<Join />} />
         <Route path="/*" element={<Workspace currentUser={currentUser} isMobileMenuOpen={isMobileMenuOpen} onMobileMenuClose={() => setIsMobileMenuOpen(false)} />} />
       </Routes>
     </div>

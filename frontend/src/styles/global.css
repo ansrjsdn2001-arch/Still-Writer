@@ -13,6 +13,8 @@
   --color-bg-light: #f6f1e7;
   --color-text-light: #2c2a27;
   --color-point: #4f8f88;
+  --button-point: #4f8f88;
+  --button-point-strong: #28796f;
   --gray1: #000000;
   --gray2: #222222;
   --gray3: #444444;
@@ -90,7 +92,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [contenteditabl
   cursor: pointer;
   font-weight: 700;
 }
-.primary-button { color: #fff; background: var(--accent-strong); border: 1px solid var(--accent-strong); }
+.primary-button { color: #fff; background: var(--button-point-strong); border: 1px solid var(--button-point-strong); }
 .primary-button:hover { filter: brightness(1.08); }
 .secondary-button { color: var(--text); background: var(--surface-strong); border: 1px solid var(--border); }
 .secondary-button:hover { border-color: var(--accent); color: var(--accent-strong); }
@@ -104,8 +106,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, [contenteditabl
   gap: 7px;
   padding: 0 16px;
   color: #fff;
-  background: var(--accent-strong);
-  border: 1px solid var(--accent-strong);
+  background: var(--button-point-strong);
+  border: 1px solid var(--button-point-strong);
   border-radius: 7px;
   font-weight: 800;
   white-space: nowrap;

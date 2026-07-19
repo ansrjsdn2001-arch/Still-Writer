@@ -31,7 +31,7 @@
 .app-header__auth a { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; padding: 0 16px; border-radius: 7px; font-size: 14px; font-weight: 700; text-decoration: none; }
 .app-header__login { color: var(--text); border: 1px solid var(--border); background: var(--surface-strong); }
 .app-header__login:hover { color: var(--accent-strong); border-color: var(--accent); }
-.app-header__join { color: #fff; border: 1px solid var(--accent-strong); background: var(--accent-strong); }
+.app-header__join { color: #fff; border: 1px solid var(--button-point-strong); background: var(--button-point-strong); }
 .app-header__join:hover { filter: brightness(1.08); }
 .account-menu { position: relative; }
 .account-menu__trigger { min-width: 120px; max-width: 240px; min-height: 42px; display: flex; align-items: center; justify-content: flex-end; gap: 5px; padding: 0 10px 0 14px; color: var(--text); background: transparent; border: 1px solid transparent; border-radius: 7px; cursor: pointer; }
@@ -95,7 +95,7 @@
   .mobile-nav__icon { width: 34px; height: 32px; display: grid; place-items: center; border-radius: 8px; }
   .mobile-nav__item svg { font-size: 23px; }
   .mobile-nav__item.is-active { color: var(--accent-strong); }
-  .mobile-nav__item.is-primary .mobile-nav__icon { width: 48px; height: 48px; margin-top: -22px; color: #fff; background: var(--accent-strong); box-shadow: 0 5px 14px rgba(40, 121, 111, 0.28); }
+  .mobile-nav__item.is-primary .mobile-nav__icon { width: 48px; height: 48px; margin-top: -22px; color: #fff; background: var(--button-point-strong); box-shadow: 0 5px 14px rgba(40, 121, 111, 0.28); }
 
   .mobile-drawer { position: fixed; inset: 64px 0 76px; z-index: 85; display: block; visibility: hidden; pointer-events: none; }
   .mobile-drawer.is-open { visibility: visible; pointer-events: auto; }

@@ -57,7 +57,7 @@ Still Writer/
 
 프로젝트 문서상 다음 기술과 기능을 목표로 하지만, 현재 코드나 의존성에서는 아직 확인되지 않는다.
 
-- MySQL 8.0 이상
+- Supabase가 관리하는 PostgreSQL
 - MyBatis
 - Spring Security
 - JWT Access Token과 Refresh Token
@@ -123,9 +123,9 @@ Client
 → Service
 → Mapper Interface
 → Mapper XML
-→ MySQL
+→ Supabase PostgreSQL
 
-MySQL
+Supabase PostgreSQL
 → Mapper
 → Service
 → Response DTO
@@ -230,13 +230,14 @@ MySQL
 
 ## 8. Still Writer 데이터 규칙
 
-`DB구조.txt`에 정의된 17개 테이블은 목표 스키마로 취급한다.
+`DB구조.txt`에 정의된 19개 테이블은 목표 스키마로 취급한다.
 
 ```text
 users
 auth_identities
 user_sessions
 password_reset_tokens
+email_verification_codes
 user_settings
 external_storage_accounts
 folders
@@ -248,14 +249,17 @@ document_tags
 materials
 material_tags
 document_materials
+document_external_files
 document_shares
 daily_writing_stats
 ```
 
 구현 시 다음 프로젝트 규칙을 검토한다.
 
-- MySQL 8.0 이상과 `utf8mb4`를 기준으로 한다.
-- 시간은 `DATETIME(6)`과 UTC 저장을 기본으로 검토하고, 사용자 표시는 설정된 시간대로 변환한다.
+- Supabase가 관리하는 PostgreSQL을 기준으로 하며, Supabase Auth가 아닌 Spring Boot 인증 구조를 사용한다.
+- 시간은 `TIMESTAMPTZ(6)`과 UTC 저장을 기본으로 검토하고, 사용자 표시는 설정된 시간대로 변환한다.
+- PostgreSQL에는 `UNSIGNED`가 없으므로 음수가 될 수 없는 값은 `CHECK` 제약조건과 백엔드 검증을 함께 적용한다.
+- JSON 본문과 메타데이터는 `JSONB`, 긴 본문은 `TEXT`, 암호화된 바이너리는 `BYTEA`, IP 주소는 `INET` 사용을 기본으로 검토한다.
 - 글, 폴더, 소재는 `deleted_at`과 `purge_after`를 사용하는 소프트 삭제 대상이다.
 - 일반 서비스 흐름에서 `users`, `folders`, `documents`, `materials`를 직접 DELETE하지 않는다.
 - 글·폴더·소재의 영구 삭제 기본 유예 기간은 문서상 30일이다.
@@ -377,7 +381,7 @@ MyBatis가 사용자 승인 후 도입되면 다음 연결을 유지한다.
 Service
 → Mapper Interface
 → Mapper XML
-→ MySQL
+→ Supabase PostgreSQL
 ```
 
 - Mapper Interface 메서드명과 XML의 `id`를 일치시킨다.

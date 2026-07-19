@@ -1,6 +1,63 @@
 spring:
   application:
     name: still-writer-backend
+  config:
+    # 로컬 실행에서는 backend/.env를 읽고, 배포 환경에서는 실제 환경 변수가 같은 값을 덮어씁니다.
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:file:backend/.env[.properties]"
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME:postgres}?sslmode=${DB_SSL_MODE:require}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      # Supabase 무료 인스턴스의 연결 수를 불필요하게 점유하지 않도록 작은 풀을 사용합니다.
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:5}
+      minimum-idle: ${DB_POOL_MIN_IDLE:0}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:30000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT_MS:5000}
+      idle-timeout: ${DB_IDLE_TIMEOUT_MS:600000}
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:stillwriter01@gmail.com}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+still-writer:
+  auth:
+    jwt-secret: ${JWT_SECRET:local-development-jwt-secret-change-before-production}
+    access-token-expires-minutes: ${ACCESS_TOKEN_EXPIRES_MINUTES:15}
+    refresh-token-expires-hours: ${REFRESH_TOKEN_EXPIRES_HOURS:12}
+    refresh-token-cookie-secure: ${REFRESH_TOKEN_COOKIE_SECURE:false}
+  oauth:
+    google:
+      client-id: "${GOOGLE_OAUTH_CLIENT_ID:}"
+      client-secret: "${GOOGLE_OAUTH_CLIENT_SECRET:}"
+      redirect-uri: "${GOOGLE_OAUTH_REDIRECT_URI:http://localhost:8080/api/auth/oauth/google/callback}"
+      authorization-uri: "${GOOGLE_OAUTH_AUTHORIZATION_URI:https://accounts.google.com/o/oauth2/v2/auth}"
+      token-uri: "${GOOGLE_OAUTH_TOKEN_URI:https://oauth2.googleapis.com/token}"
+      user-info-uri: "${GOOGLE_OAUTH_USER_INFO_URI:https://openidconnect.googleapis.com/v1/userinfo}"
+      scope: "${GOOGLE_OAUTH_SCOPE:openid profile email}"
+      success-redirect-uri: "${GOOGLE_OAUTH_SUCCESS_REDIRECT_URI:http://localhost:5173/oauth/google/callback}"
+  email-verification:
+    from: ${MAIL_FROM:stillwriter01@gmail.com}
+    code-length: ${EMAIL_VERIFICATION_CODE_LENGTH:6}
+    expires-minutes: ${EMAIL_VERIFICATION_EXPIRES_MINUTES:3}
+
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+  type-aliases-package: com.stillwriter
+  configuration:
+    map-underscore-to-camel-case: true
+    default-statement-timeout: 10
 
 server:
   port: ${PORT:8080}

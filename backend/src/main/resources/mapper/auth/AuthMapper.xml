@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stillwriter.auth.mapper.AuthMapper">
+
+    <select id="existsUserByEmail" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM users
+            WHERE email = #{email}
+        )
+    </select>
+
+    <select id="existsUserByNickname" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM users
+            WHERE nickname = #{nickname}
+        )
+    </select>
+
+    <insert id="insertLocalUser"
+            parameterType="com.stillwriter.auth.domain.NewLocalUser"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO users (
+            email,
+            password_hash,
+            nickname
+        )
+        VALUES (
+            #{email},
+            #{passwordHash},
+            #{nickname}
+        )
+    </insert>
+
+    <insert id="insertLocalIdentity">
+        INSERT INTO auth_identities (
+            user_id,
+            provider,
+            provider_user_id,
+            provider_email
+        )
+        VALUES (
+            #{userId},
+            'LOCAL',
+            #{providerUserId},
+            #{providerEmail}
+        )
+    </insert>
+
+    <insert id="insertOAuthIdentity">
+        INSERT INTO auth_identities (
+            user_id,
+            provider,
+            provider_user_id,
+            provider_email
+        )
+        VALUES (
+            #{userId},
+            #{provider},
+            #{providerUserId},
+            #{providerEmail}
+        )
+    </insert>
+
+    <insert id="insertDefaultUserSettings">
+        INSERT INTO user_settings (
+            user_id
+        )
+        VALUES (
+            #{userId}
+        )
+    </insert>
+
+    <insert id="insertSocialUser"
+            parameterType="com.stillwriter.auth.domain.NewSocialUser"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO users (
+            email,
+            password_hash,
+            nickname
+        )
+        VALUES (
+            #{email},
+            NULL,
+            #{nickname}
+        )
+    </insert>
+
+    <select id="findSignupResultById" resultType="com.stillwriter.auth.domain.UserSignupResult">
+        SELECT
+            id,
+            email,
+            nickname,
+            status,
+            created_at AS createdAt
+        FROM users
+        WHERE id = #{userId}
+    </select>
+
+    <select id="findLoginUserByEmail" resultType="com.stillwriter.auth.domain.LoginUser">
+        SELECT
+            id,
+            email,
+            password_hash AS passwordHash,
+            nickname,
+            status
+        FROM users
+        WHERE email = #{email}
+    </select>
+
+    <select id="findLoginUserByProvider" resultType="com.stillwriter.auth.domain.LoginUser">
+        SELECT
+            u.id,
+            u.email,
+            u.password_hash AS passwordHash,
+            u.nickname,
+            u.status
+        FROM auth_identities ai
+        JOIN users u ON u.id = ai.user_id
+        WHERE ai.provider = #{provider}
+          AND ai.provider_user_id = #{providerUserId}
+    </select>
+
+    <insert id="insertUserSession"
+            parameterType="com.stillwriter.auth.domain.NewUserSession"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO user_sessions (
+            user_id,
+            refresh_token_hash,
+            device_name,
+            ip_address,
+            user_agent,
+            expires_at
+        )
+        VALUES (
+            #{userId},
+            #{refreshTokenHash},
+            #{deviceName},
+            CAST(#{ipAddress} AS INET),
+            #{userAgent},
+            #{expiresAt}
+        )
+    </insert>
+
+    <update id="updateLastLoginAt">
+        UPDATE users
+        SET last_login_at = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{userId}
+    </update>
+</mapper>

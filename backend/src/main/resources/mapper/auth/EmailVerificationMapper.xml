@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stillwriter.auth.mapper.EmailVerificationMapper">
+
+    <update id="expirePendingCodes">
+        UPDATE email_verification_codes
+        SET consumed_at = CURRENT_TIMESTAMP
+        WHERE email = #{email}
+          AND purpose = #{purpose}
+          AND verified_at IS NULL
+          AND consumed_at IS NULL
+    </update>
+
+    <insert id="insertVerificationCode"
+            parameterType="com.stillwriter.auth.domain.NewEmailVerificationCode">
+        INSERT INTO email_verification_codes (
+            email,
+            purpose,
+            code_hash,
+            expires_at
+        )
+        VALUES (
+            #{email},
+            #{purpose},
+            #{codeHash},
+            #{expiresAt}
+        )
+    </insert>
+
+    <update id="increaseAttemptCount">
+        UPDATE email_verification_codes
+        SET attempt_count = attempt_count + 1
+        WHERE email = #{email}
+          AND purpose = #{purpose}
+          AND verified_at IS NULL
+          AND consumed_at IS NULL
+          AND expires_at > CURRENT_TIMESTAMP
+          AND attempt_count &lt; 10
+    </update>
+
+    <select id="findValidCodeId" resultType="long">
+        SELECT id
+        FROM email_verification_codes
+        WHERE email = #{email}
+          AND purpose = #{purpose}
+          AND code_hash = #{codeHash}
+          AND verified_at IS NULL
+          AND consumed_at IS NULL
+          AND expires_at > CURRENT_TIMESTAMP
+          AND attempt_count &lt;= 10
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <update id="markVerified">
+        UPDATE email_verification_codes
+        SET verified_at = #{verifiedAt}
+        WHERE id = #{id}
+          AND verified_at IS NULL
+          AND consumed_at IS NULL
+    </update>
+
+    <select id="findVerifiedCodeById" resultType="com.stillwriter.auth.domain.VerifiedEmailCode">
+        SELECT
+            id,
+            email,
+            verified_at AS verifiedAt
+        FROM email_verification_codes
+        WHERE id = #{id}
+          AND verified_at IS NOT NULL
+    </select>
+
+    <select id="findVerifiedSignupCodeId" resultType="long">
+        SELECT id
+        FROM email_verification_codes
+        WHERE email = #{email}
+          AND purpose = #{purpose}
+          AND verified_at IS NOT NULL
+          AND consumed_at IS NULL
+          AND expires_at > CURRENT_TIMESTAMP
+        ORDER BY verified_at DESC
+        LIMIT 1
+    </select>
+
+    <update id="consumeVerifiedCode">
+        UPDATE email_verification_codes
+        SET consumed_at = #{consumedAt}
+        WHERE id = #{id}
+          AND verified_at IS NOT NULL
+          AND consumed_at IS NULL
+    </update>
+</mapper>

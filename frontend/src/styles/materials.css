@@ -4,7 +4,7 @@
 .materials-heading p { margin: 10px 0 0; color: var(--accent-strong); font-size: 16px; }
 .materials-heading__actions { display: flex; align-items: center; gap: 12px; }
 .materials-search { width: min(30vw, 310px); }
-.materials-add-button { min-width: 132px; min-height: 54px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; color: #fff; background: var(--accent-strong); border: 1px solid var(--accent-strong); border-radius: 9px; font-weight: 800; cursor: pointer; }
+.materials-add-button { min-width: 132px; min-height: 54px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; color: #fff; background: var(--button-point-strong); border: 1px solid var(--button-point-strong); border-radius: 9px; font-weight: 800; cursor: pointer; }
 .materials-categories { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 .materials-categories button { min-height: 44px; padding: 0 22px; color: var(--muted); background: var(--surface-strong); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
 .materials-categories button.is-active { color: var(--accent-strong); background: var(--accent-soft); border-color: transparent; font-weight: 800; }
@@ -18,7 +18,7 @@
 .materials-empty > span svg { font-size: 36px; }
 .materials-empty strong { color: var(--text); font-size: 18px; }
 .materials-empty p { margin: 9px 0 18px; font-size: 14px; }
-.materials-empty button { min-height: 42px; display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; color: #fff; background: var(--accent-strong); border: 0; border-radius: 7px; cursor: pointer; }
+.materials-empty button { min-height: 42px; display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; color: #fff; background: var(--button-point-strong); border: 0; border-radius: 7px; cursor: pointer; }
 .materials-guide { min-height: 50px; display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 0 16px; color: var(--muted); background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface-strong)); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
 .materials-guide svg { color: var(--accent-strong); }
 .materials-status { min-height: 22px; margin: 10px 2px 0; color: var(--muted); font-size: 13px; }
