@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: still-writer-backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: still-writer-frontend
+    environment:
+      # Vite 개발 서버가 /api 요청을 Docker 네트워크 안의 backend 컨테이너로 프록시합니다.
+      VITE_PROXY_TARGET: http://backend:8080
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend

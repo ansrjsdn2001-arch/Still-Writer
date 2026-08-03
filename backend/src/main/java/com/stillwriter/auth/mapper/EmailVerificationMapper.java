@@ -18,11 +18,14 @@ public interface EmailVerificationMapper {
 
     void insertVerificationCode(NewEmailVerificationCode verificationCode);
 
-    int increaseAttemptCount(@Param("email") String email, @Param("purpose") String purpose);
+    int increaseLatestAttemptCount(@Param("email") String email,
+                                   @Param("purpose") String purpose,
+                                   @Param("maxAttempts") int maxAttempts);
 
     Optional<Long> findValidCodeId(@Param("email") String email,
                                    @Param("purpose") String purpose,
-                                   @Param("codeHash") String codeHash);
+                                   @Param("codeHash") String codeHash,
+                                   @Param("maxAttempts") int maxAttempts);
 
     int markVerified(@Param("id") Long id, @Param("verifiedAt") OffsetDateTime verifiedAt);
 

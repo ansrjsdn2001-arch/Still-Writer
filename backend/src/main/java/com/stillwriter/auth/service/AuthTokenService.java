@@ -1,8 +1,12 @@
 package com.stillwriter.auth.service;
 
+import com.stillwriter.auth.domain.AccessTokenPayload;
 import com.stillwriter.auth.domain.IssuedToken;
+import com.stillwriter.common.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -25,13 +29,16 @@ import java.util.HexFormat;
 public class AuthTokenService {
 
     private final SecureRandom secureRandom = new SecureRandom();
+    private final ObjectMapper objectMapper;
     private final String jwtSecret;
     private final long accessTokenExpiresMinutes;
 
     public AuthTokenService(
+            ObjectMapper objectMapper,
             @Value("${still-writer.auth.jwt-secret}") String jwtSecret,
             @Value("${still-writer.auth.access-token-expires-minutes}") long accessTokenExpiresMinutes
     ) {
+        this.objectMapper = objectMapper;
         this.jwtSecret = jwtSecret;
         this.accessTokenExpiresMinutes = accessTokenExpiresMinutes;
     }
@@ -52,6 +59,55 @@ public class AuthTokenService {
         String signature = base64Url(hmacSha256(unsignedToken));
 
         return new IssuedToken(unsignedToken + "." + signature, expiresAt);
+    }
+
+    public AccessTokenPayload parseAccessToken(String token) {
+        if (token == null || token.isBlank()) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new UnauthorizedException("Access Token 형식이 올바르지 않습니다.");
+        }
+
+        String unsignedToken = parts[0] + "." + parts[1];
+        String expectedSignature = base64Url(hmacSha256(unsignedToken));
+
+        if (!MessageDigest.isEqual(
+                expectedSignature.getBytes(StandardCharsets.UTF_8),
+                parts[2].getBytes(StandardCharsets.UTF_8)
+        )) {
+            throw new UnauthorizedException("Access Token 서명이 올바르지 않습니다.");
+        }
+
+        try {
+            String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+            JsonNode payload = objectMapper.readTree(payloadJson);
+
+            String subject = payload.path("sub").asText(null);
+            String email = payload.path("email").asText(null);
+            long expiresEpochSeconds = payload.path("exp").asLong(0);
+
+            if (subject == null || subject.isBlank() || email == null || email.isBlank() || expiresEpochSeconds <= 0) {
+                throw new UnauthorizedException("Access Token 정보가 올바르지 않습니다.");
+            }
+
+            OffsetDateTime expiresAt = OffsetDateTime.ofInstant(
+                    java.time.Instant.ofEpochSecond(expiresEpochSeconds),
+                    ZoneOffset.UTC
+            );
+
+            if (!expiresAt.isAfter(OffsetDateTime.now(ZoneOffset.UTC))) {
+                throw new UnauthorizedException("로그인이 만료되었습니다. 다시 로그인해 주세요.");
+            }
+
+            return new AccessTokenPayload(Long.parseLong(subject), email, expiresAt);
+        } catch (UnauthorizedException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new UnauthorizedException("Access Token을 확인할 수 없습니다.");
+        }
     }
 
     public String issueRefreshToken() {

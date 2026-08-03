@@ -33,6 +33,7 @@ public class EmailVerificationService {
     private static final String SIGNUP_PURPOSE = "SIGNUP";
 
     private final EmailVerificationMapper emailVerificationMapper;
+    private final EmailVerificationAttemptService attemptService;
     private final AuthMapper authMapper;
     private final JavaMailSender mailSender;
     private final VerificationCodeGenerator codeGenerator;
@@ -43,9 +44,11 @@ public class EmailVerificationService {
     private final String mailPassword;
     private final int codeLength;
     private final long expiresMinutes;
+    private final int maxAttempts;
 
     public EmailVerificationService(
             EmailVerificationMapper emailVerificationMapper,
+            EmailVerificationAttemptService attemptService,
             AuthMapper authMapper,
             JavaMailSender mailSender,
             VerificationCodeGenerator codeGenerator,
@@ -55,9 +58,11 @@ public class EmailVerificationService {
             @Value("${spring.mail.password:}") String mailPassword,
             @Value("${still-writer.email-verification.from}") String from,
             @Value("${still-writer.email-verification.code-length}") int codeLength,
-            @Value("${still-writer.email-verification.expires-minutes}") long expiresMinutes
+            @Value("${still-writer.email-verification.expires-minutes}") long expiresMinutes,
+            @Value("${still-writer.email-verification.max-attempts}") int maxAttempts
     ) {
         this.emailVerificationMapper = emailVerificationMapper;
+        this.attemptService = attemptService;
         this.authMapper = authMapper;
         this.mailSender = mailSender;
         this.codeGenerator = codeGenerator;
@@ -68,6 +73,7 @@ public class EmailVerificationService {
         this.from = from;
         this.codeLength = codeLength;
         this.expiresMinutes = expiresMinutes;
+        this.maxAttempts = maxAttempts;
     }
 
     /**
@@ -119,9 +125,12 @@ public class EmailVerificationService {
         String email = normalizeEmail(request.email());
         String codeHash = sha256(request.code());
 
-        emailVerificationMapper.increaseAttemptCount(email, SIGNUP_PURPOSE);
+        int increasedRows = attemptService.increaseAttemptCount(email, SIGNUP_PURPOSE, maxAttempts);
+        if (increasedRows == 0) {
+            throw new IllegalArgumentException("인증 코드가 올바르지 않거나 만료되었습니다.");
+        }
 
-        Long codeId = emailVerificationMapper.findValidCodeId(email, SIGNUP_PURPOSE, codeHash)
+        Long codeId = emailVerificationMapper.findValidCodeId(email, SIGNUP_PURPOSE, codeHash, maxAttempts)
                 .orElseThrow(() -> new IllegalArgumentException("인증 코드가 올바르지 않거나 만료되었습니다."));
 
         OffsetDateTime verifiedAt = OffsetDateTime.now();

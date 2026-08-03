@@ -43,12 +43,6 @@
 .account-menu__popover a, .account-menu__popover button { width: 100%; min-height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 11px; color: var(--text); background: transparent; border: 0; border-radius: 6px; text-align: left; text-decoration: none; cursor: pointer; }
 .account-menu__popover a:hover, .account-menu__popover button:hover { color: var(--accent-strong); background: var(--accent-soft); }
 .account-menu__popover svg { font-size: 20px; }
-.profile-settings-page { min-height: calc(100vh - 72px); display: flex; align-items: flex-start; gap: 18px; padding: 48px; }
-.profile-settings-page__icon { width: 58px; height: 58px; display: grid; place-items: center; flex: 0 0 58px; color: var(--accent-strong); background: var(--accent-soft); border-radius: 12px; }
-.profile-settings-page__icon svg { font-size: 32px; }
-.profile-settings-page h1 { margin: 3px 0 8px; font-size: 28px; }
-.profile-settings-page p { margin: 0; color: var(--muted); }
-
 .sidebar { position: fixed; inset: 72px auto 0 0; z-index: 30; width: 272px; display: flex; flex-direction: column; gap: 24px; padding: 28px 20px; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); scrollbar-width: none; }
 .sidebar::-webkit-scrollbar { display: none; }
 .sidebar__nav, .sidebar__utility { display: grid; gap: 6px; }
@@ -89,7 +83,6 @@
   .account-menu { display: none; }
   .sidebar { display: none; }
   .app__main { min-height: calc(100vh - 76px); margin-left: 0; padding-top: 64px; padding-bottom: 76px; }
-  .profile-settings-page { min-height: calc(100vh - 140px); padding: 28px 20px; }
   .mobile-nav { position: fixed; inset: auto 0 0 0; z-index: 80; height: 76px; display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); background: var(--surface-strong); border-top: 1px solid var(--border); }
   .mobile-nav__item { min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; color: var(--muted); background: transparent; font-size: 11px; cursor: pointer; }
   .mobile-nav__icon { width: 34px; height: 32px; display: grid; place-items: center; border-radius: 8px; }

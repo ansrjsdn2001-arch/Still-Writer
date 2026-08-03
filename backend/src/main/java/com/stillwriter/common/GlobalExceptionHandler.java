@@ -52,6 +52,20 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(exception.getMessage()));
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(exception.getMessage()));
+    }
+
     @ExceptionHandler(MailDeliveryException.class)
     public ResponseEntity<ErrorResponse> handleMailDelivery(MailDeliveryException exception) {
         return ResponseEntity

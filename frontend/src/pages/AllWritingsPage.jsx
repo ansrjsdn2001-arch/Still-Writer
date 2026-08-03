@@ -1,40 +1,83 @@
-import { useState } from "react";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import WriteActionButton from "../components/common/WriteActionButton";
-import "../styles/writings.css";
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
+import WriteActionButton from '../components/common/WriteActionButton';
+import { getDocuments } from '../api/documents';
+import { getApiErrorMessage } from '../api/client';
+import '../styles/writings.css';
 
 const tabs = [
-  { id: "all", label: "전체 글" },
-  { id: "recent", label: "최근 작성" },
-  { id: "folders", label: "폴더" },
+  { id: 'all', label: '전체 글' },
+  { id: 'recent', label: '최근 작성' },
+  { id: 'folders', label: '폴더' },
 ];
-const writings = [];
 
-/**
- * 사용자가 작성한 모든 글을 검색하고 정렬하는 페이지입니다.
- * API 연결 전에는 가짜 글을 만들지 않고 빈 목록 상태를 보여줍니다.
- */
+function formatDateTime(value) {
+  if (!value) return '-';
+  return new Intl.DateTimeFormat('ko-KR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value));
+}
+
 export default function AllWritingsPage() {
-  const [activeTab, setActiveTab] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("updated-desc");
-  const normalizedQuery = searchQuery.trim().toLocaleLowerCase("ko-KR");
-  const visibleWritings = normalizedQuery
-    ? writings.filter((writing) =>
-        [writing.title, writing.content, writing.folderName]
-          .filter(Boolean)
-          .some((value) => value.toLocaleLowerCase("ko-KR").includes(normalizedQuery)),
-      )
-    : writings;
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('updated-desc');
+  const [writings, setWritings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadDocuments() {
+      try {
+        setIsLoading(true);
+        setErrorMessage('');
+        const response = await getDocuments();
+        if (!ignore) setWritings(response.data ?? []);
+      } catch (error) {
+        if (!ignore) setErrorMessage(getApiErrorMessage(error, '글 목록을 불러오지 못했습니다.'));
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+
+    loadDocuments();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const visibleWritings = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLocaleLowerCase('ko-KR');
+    const filtered = normalizedQuery
+      ? writings.filter((writing) =>
+          [writing.title, writing.preview]
+            .filter(Boolean)
+            .some((value) => value.toLocaleLowerCase('ko-KR').includes(normalizedQuery)),
+        )
+      : writings;
+
+    return [...filtered].sort((a, b) => {
+      if (sortOrder === 'created-desc') return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortOrder === 'created-asc') return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortOrder === 'title-asc') return (a.title ?? '').localeCompare(b.title ?? '', 'ko-KR');
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+  }, [searchQuery, sortOrder, writings]);
 
   const emptyTitle = searchQuery.trim()
-    ? "검색 결과가 없습니다."
-    : "아직 작성한 글이 없습니다.";
+    ? '검색 결과가 없습니다.'
+    : '아직 작성한 글이 없습니다.';
   const emptyDescription = searchQuery.trim()
-    ? "다른 검색어를 입력해 보세요."
-    : "글이 등록되면 최근 수정 순서로 이곳에 표시됩니다.";
+    ? '다른 검색어를 입력해 보세요.'
+    : '글을 작성하면 최근 수정 순서로 이곳에 표시됩니다.';
 
   return (
     <div className="writings-page">
@@ -47,7 +90,7 @@ export default function AllWritingsPage() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={activeTab === tab.id ? "is-active" : ""}
+            className={activeTab === tab.id ? 'is-active' : ''}
             type="button"
             role="tab"
             onClick={() => setActiveTab(tab.id)}
@@ -67,7 +110,7 @@ export default function AllWritingsPage() {
             type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="글 제목, 내용, 폴더 검색"
+            placeholder="글 제목, 내용 검색"
           />
         </label>
 
@@ -86,13 +129,50 @@ export default function AllWritingsPage() {
       </section>
 
       <section id="writings-list-panel" className="writings-list" role="tabpanel" aria-label="글 목록" aria-live="polite">
-        {visibleWritings.length === 0 && (
+        {isLoading && (
+          <div className="writings-empty">
+            <span className="writings-empty__icon" aria-hidden="true">
+              <DescriptionOutlinedIcon />
+            </span>
+            <strong>글 목록을 불러오는 중입니다.</strong>
+          </div>
+        )}
+
+        {!isLoading && errorMessage && (
+          <div className="writings-empty">
+            <span className="writings-empty__icon" aria-hidden="true">
+              <DescriptionOutlinedIcon />
+            </span>
+            <strong>{errorMessage}</strong>
+          </div>
+        )}
+
+        {!isLoading && !errorMessage && visibleWritings.length === 0 && (
           <div className="writings-empty">
             <span className="writings-empty__icon" aria-hidden="true">
               <DescriptionOutlinedIcon />
             </span>
             <strong>{emptyTitle}</strong>
             <p>{emptyDescription}</p>
+          </div>
+        )}
+
+        {!isLoading && !errorMessage && visibleWritings.length > 0 && (
+          <div className="writings-card-list">
+            {visibleWritings.map((writing) => (
+              <button
+                key={writing.id}
+                className="writings-card"
+                type="button"
+                onClick={() => navigate(`/writings/${writing.id}`)}
+              >
+                <strong>{writing.title || '제목 없음'}</strong>
+                <p>{writing.preview || '본문 내용이 없습니다.'}</p>
+                <span>
+                  {formatDateTime(writing.updatedAt)} · {Number(writing.charCount ?? 0).toLocaleString()}자
+                </span>
+              </button>
+            ))}
           </div>
         )}
       </section>

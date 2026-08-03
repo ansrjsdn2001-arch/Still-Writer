@@ -38,6 +38,7 @@ still-writer:
     refresh-token-expires-hours: ${REFRESH_TOKEN_EXPIRES_HOURS:12}
     refresh-token-cookie-secure: ${REFRESH_TOKEN_COOKIE_SECURE:false}
   oauth:
+    exchange-code-expires-seconds: ${OAUTH_EXCHANGE_CODE_EXPIRES_SECONDS:120}
     google:
       client-id: "${GOOGLE_OAUTH_CLIENT_ID:}"
       client-secret: "${GOOGLE_OAUTH_CLIENT_SECRET:}"
@@ -47,10 +48,20 @@ still-writer:
       user-info-uri: "${GOOGLE_OAUTH_USER_INFO_URI:https://openidconnect.googleapis.com/v1/userinfo}"
       scope: "${GOOGLE_OAUTH_SCOPE:openid profile email}"
       success-redirect-uri: "${GOOGLE_OAUTH_SUCCESS_REDIRECT_URI:http://localhost:5173/oauth/google/callback}"
+    kakao:
+      client-id: "${KAKAO_OAUTH_CLIENT_ID:}"
+      client-secret: "${KAKAO_OAUTH_CLIENT_SECRET:}"
+      redirect-uri: "${KAKAO_OAUTH_REDIRECT_URI:http://localhost:8080/api/auth/oauth/kakao/callback}"
+      authorization-uri: "${KAKAO_OAUTH_AUTHORIZATION_URI:https://kauth.kakao.com/oauth/authorize}"
+      token-uri: "${KAKAO_OAUTH_TOKEN_URI:https://kauth.kakao.com/oauth/token}"
+      user-info-uri: "${KAKAO_OAUTH_USER_INFO_URI:https://kapi.kakao.com/v2/user/me}"
+      scope: "${KAKAO_OAUTH_SCOPE:profile_nickname}"
+      success-redirect-uri: "${KAKAO_OAUTH_SUCCESS_REDIRECT_URI:http://localhost:5173/oauth/kakao/callback}"
   email-verification:
     from: ${MAIL_FROM:stillwriter01@gmail.com}
     code-length: ${EMAIL_VERIFICATION_CODE_LENGTH:6}
     expires-minutes: ${EMAIL_VERIFICATION_EXPIRES_MINUTES:3}
+    max-attempts: ${EMAIL_VERIFICATION_MAX_ATTEMPTS:10}
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml

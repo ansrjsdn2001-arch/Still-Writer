@@ -1,0 +1,115 @@
+.error-page {
+  width: min(100%, 1120px);
+  min-height: calc(100vh - 72px);
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  padding: 40px clamp(28px, 4vw, 54px) 56px;
+}
+
+.error-state {
+  width: min(100%, 720px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(34px, 6vw, 58px);
+  color: var(--muted);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.error-state__icon {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-radius: 18px;
+}
+
+.error-state__icon svg {
+  font-size: 42px;
+}
+
+.error-state__eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.error-state h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+}
+
+.error-state__description {
+  max-width: 520px;
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.error-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.error-state__actions button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.error-state__primary {
+  color: #fff;
+  background: var(--button-point-strong);
+  border: 1px solid var(--button-point-strong);
+}
+
+.error-state__primary:hover {
+  filter: brightness(1.08);
+}
+
+.error-state__secondary {
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.error-state__secondary:hover {
+  color: var(--accent-strong);
+  border-color: var(--accent);
+}
+
+@media (max-width: 767px) {
+  .error-page {
+    min-height: calc(100vh - 140px);
+    padding: 28px 16px 34px;
+  }
+
+  .error-state__actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

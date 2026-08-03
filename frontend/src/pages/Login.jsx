@@ -1,17 +1,19 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import ArrowBackIosNewRounded from "@mui/icons-material/ArrowBackIosNewRounded";
-import LockOutlined from "@mui/icons-material/LockOutlined";
-import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
-import VisibilityOffOutlined from "@mui/icons-material/VisibilityOffOutlined";
-import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
-import { login, startGoogleLogin } from "../api/auth";
-import { getApiErrorMessage } from "../api/client";
-import "../styles/login.css";
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import ArrowBackIosNewRounded from '@mui/icons-material/ArrowBackIosNewRounded';
+import LockOutlined from '@mui/icons-material/LockOutlined';
+import MailOutlineRounded from '@mui/icons-material/MailOutlineRounded';
+import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
+import { login, startGoogleLogin, startKakaoLogin } from '../api/auth';
+import { getApiErrorMessage, saveAccessToken } from '../api/client';
+import '../styles/login.css';
+
+const LOGIN_REDIRECT_STORAGE_KEY = 'still-writer-login-redirect-to';
 
 const INITIAL_FORM = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
   keepSignedIn: false,
 };
 
@@ -19,29 +21,36 @@ function validateLoginForm(form) {
   const errors = {};
   const email = form.email.trim();
 
-  if (!email) errors.email = "이메일을 입력해 주세요.";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "올바른 이메일 형식을 입력해 주세요.";
-
-  if (!form.password) errors.password = "비밀번호를 입력해 주세요.";
+  if (!email) errors.email = '이메일을 입력해 주세요.';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = '올바른 이메일 형식을 입력해 주세요.';
+  if (!form.password) errors.password = '비밀번호를 입력해 주세요.';
 
   return errors;
 }
 
-/** 백엔드 LOCAL 로그인 API와 연결된 로그인 화면입니다. */
+function getSafeRedirectPath(value) {
+  if (typeof value !== 'string') return '/';
+  if (!value.startsWith('/') || value.startsWith('//')) return '/';
+  if (value === '/login' || value === '/join') return '/';
+  if (value.startsWith('/oauth/')) return '/';
+  return value;
+}
+
 export default function Login({ onLogin }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
-  const [statusMessage, setStatusMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const redirectTo = getSafeRedirectPath(location.state?.from);
 
   const handleChange = (event) => {
     const { name, type, checked, value } = event.target;
-    setForm((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
+    setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
     setErrors((current) => ({ ...current, [name]: undefined, form: undefined }));
-    setStatusMessage("");
+    setStatusMessage('');
   };
 
   const handleSubmit = async (event) => {
@@ -58,7 +67,7 @@ export default function Login({ onLogin }) {
     }
 
     setIsSubmitting(true);
-    setStatusMessage("");
+    setStatusMessage('');
 
     try {
       const result = await login({
@@ -67,8 +76,7 @@ export default function Login({ onLogin }) {
       });
       const loginData = result.data;
 
-      // Refresh Token은 백엔드가 HttpOnly 쿠키로 저장합니다. Access Token은 탭 세션 안에서만 사용하도록 분리합니다.
-      window.sessionStorage.setItem("still-writer-access-token", loginData.accessToken);
+      saveAccessToken(loginData.accessToken);
       onLogin({
         userId: loginData.userId,
         email: loginData.email,
@@ -78,16 +86,17 @@ export default function Login({ onLogin }) {
         keepSignedIn: form.keepSignedIn,
       });
 
-      setForm((current) => ({ ...current, password: "" }));
-      navigate("/", { replace: true });
+      setForm((current) => ({ ...current, password: '' }));
+      window.sessionStorage.removeItem(LOGIN_REDIRECT_STORAGE_KEY);
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       const responseErrors = error?.response?.data?.errors;
-      const message = getApiErrorMessage(error, "로그인에 실패했습니다.");
+      const message = getApiErrorMessage(error, '로그인에 실패했습니다.');
 
-      if (responseErrors && typeof responseErrors === "object") {
+      if (responseErrors && typeof responseErrors === 'object') {
         setErrors((current) => ({ ...current, ...responseErrors }));
-        const firstInvalidName = Object.keys(responseErrors)[0];
-        if (firstInvalidName) event.currentTarget.elements.namedItem(firstInvalidName)?.focus();
+        const firstInvalidResponseName = Object.keys(responseErrors)[0];
+        if (firstInvalidResponseName) event.currentTarget.elements.namedItem(firstInvalidResponseName)?.focus();
       } else {
         setErrors((current) => ({ ...current, form: message }));
       }
@@ -96,12 +105,17 @@ export default function Login({ onLogin }) {
     }
   };
 
+  const handleSocialLoginStart = (startLogin) => {
+    window.sessionStorage.setItem(LOGIN_REDIRECT_STORAGE_KEY, redirectTo);
+    startLogin();
+  };
+
   return (
     <div
       className="login-page"
       style={{
-        "--login-background-light": 'url("/images/heroimage(light).png")',
-        "--login-background-dark": 'url("/images/heroimage(dark).png")',
+        '--login-background-light': 'url("/images/heroimage(light).png")',
+        '--login-background-dark': 'url("/images/heroimage(dark).png")',
       }}
     >
       <Link className="login-page__back" to="/" aria-label="이전 페이지로 이동">
@@ -116,7 +130,7 @@ export default function Login({ onLogin }) {
           </div>
 
           <form className="login-form" onSubmit={handleSubmit} noValidate>
-            <label className={`login-field${errors.email ? " is-invalid" : ""}`}>
+            <label className={`login-field${errors.email ? ' is-invalid' : ''}`}>
               <MailOutlineRounded aria-hidden="true" />
               <span className="sr-only">이메일</span>
               <input
@@ -127,38 +141,34 @@ export default function Login({ onLogin }) {
                 placeholder="이메일"
                 autoComplete="email"
                 aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? "login-email-error" : undefined}
+                aria-describedby={errors.email ? 'login-email-error' : undefined}
                 required
               />
             </label>
             {errors.email && <p className="login-field-error" id="login-email-error">{errors.email}</p>}
 
-            <label className={`login-field${errors.password ? " is-invalid" : ""}`}>
+            <label className={`login-field${errors.password ? ' is-invalid' : ''}`}>
               <LockOutlined aria-hidden="true" />
               <span className="sr-only">비밀번호</span>
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 value={form.password}
                 onChange={handleChange}
                 placeholder="비밀번호"
                 autoComplete="current-password"
                 aria-invalid={Boolean(errors.password)}
-                aria-describedby={errors.password ? "login-password-error" : undefined}
+                aria-describedby={errors.password ? 'login-password-error' : undefined}
                 required
               />
               <button
                 className="login-field__visibility"
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
+                aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
                 aria-pressed={showPassword}
               >
-                {showPassword ? (
-                  <VisibilityOutlined />
-                ) : (
-                  <VisibilityOffOutlined />
-                )}
+                {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
               </button>
             </label>
             {errors.password && <p className="login-field-error" id="login-password-error">{errors.password}</p>}
@@ -176,7 +186,7 @@ export default function Login({ onLogin }) {
             {statusMessage && <p className="login-status" role="status">{statusMessage}</p>}
 
             <button className="login-submit" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "로그인 중" : "로그인"}
+              {isSubmitting ? '로그인 중' : '로그인'}
             </button>
           </form>
 
@@ -185,39 +195,26 @@ export default function Login({ onLogin }) {
           </div>
 
           <div className="login-socials">
-            <button className="kakao-material-button" type="button">
+            <button className="kakao-material-button" type="button" onClick={() => handleSocialLoginStart(startKakaoLogin)}>
               <div className="kakao-material-button-state" />
               <div className="kakao-material-button-content-wrapper">
-                <div className="kakao-material-button-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 48 48"
-                    style={{ display: "block" }}
-                    aria-hidden="true"
-                  >
+                <div className="kakao-material-button-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style={{ display: 'block' }}>
                     <path
                       fill="#191919"
                       d="M24 7C13.5 7 5 13.7 5 22c0 5.35 3.55 10.04 8.9 12.7l-2.25 8.05a1 1 0 0 0 1.46 1.12l9.33-5.4c.52.04 1.04.06 1.56.06 10.5 0 19-6.7 19-16.53S34.5 7 24 7Z"
                     />
                   </svg>
                 </div>
-                <span className="kakao-material-button-contents">
-                  카카오로 로그인
-                </span>
-                <span style={{ display: "none" }}>카카오로 로그인</span>
+                <span className="kakao-material-button-contents">카카오로 로그인</span>
               </div>
             </button>
-            <button className="gsi-material-button" type="button" onClick={startGoogleLogin}>
+
+            <button className="gsi-material-button" type="button" onClick={() => handleSocialLoginStart(startGoogleLogin)}>
               <div className="gsi-material-button-state" />
               <div className="gsi-material-button-content-wrapper">
-                <div className="gsi-material-button-icon">
-                  <svg
-                    version="1.1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 48 48"
-                    style={{ display: "block" }}
-                    aria-hidden="true"
-                  >
+                <div className="gsi-material-button-icon" aria-hidden="true">
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style={{ display: 'block' }}>
                     <path
                       fill="#EA4335"
                       d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -237,10 +234,7 @@ export default function Login({ onLogin }) {
                     <path fill="none" d="M0 0h48v48H0z" />
                   </svg>
                 </div>
-                <span className="gsi-material-button-contents">
-                  Google로 로그인
-                </span>
-                <span style={{ display: "none" }}>Sign in with Google</span>
+                <span className="gsi-material-button-contents">Google로 로그인</span>
               </div>
             </button>
           </div>

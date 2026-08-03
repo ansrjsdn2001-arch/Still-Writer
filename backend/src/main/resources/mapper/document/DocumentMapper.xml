@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.stillwriter.document.mapper.DocumentMapper">
+
+    <insert id="insertDocument"
+            parameterType="com.stillwriter.document.domain.NewDocument"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO documents (
+            user_id,
+            type,
+            title,
+            content_json,
+            plain_text,
+            char_count,
+            char_count_without_spaces,
+            word_count,
+            sentence_count
+        )
+        VALUES (
+            #{userId},
+            #{type},
+            #{title},
+            CAST(#{contentJson} AS JSONB),
+            #{plainText},
+            #{charCount},
+            #{charCountWithoutSpaces},
+            #{wordCount},
+            #{sentenceCount}
+        )
+    </insert>
+
+    <select id="findActiveDocumentsByUserId" resultType="com.stillwriter.document.domain.Document">
+        SELECT
+            id,
+            user_id AS userId,
+            folder_id AS folderId,
+            type,
+            title,
+            content_json::text AS contentJson,
+            plain_text AS plainText,
+            char_count AS charCount,
+            char_count_without_spaces AS charCountWithoutSpaces,
+            word_count AS wordCount,
+            sentence_count AS sentenceCount,
+            status,
+            revision,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM documents
+        WHERE user_id = #{userId}
+          AND deleted_at IS NULL
+        ORDER BY updated_at DESC, id DESC
+    </select>
+
+    <select id="findActiveDocumentByIdAndUserId" resultType="com.stillwriter.document.domain.Document">
+        SELECT
+            id,
+            user_id AS userId,
+            folder_id AS folderId,
+            type,
+            title,
+            content_json::text AS contentJson,
+            plain_text AS plainText,
+            char_count AS charCount,
+            char_count_without_spaces AS charCountWithoutSpaces,
+            word_count AS wordCount,
+            sentence_count AS sentenceCount,
+            status,
+            revision,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM documents
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND deleted_at IS NULL
+    </select>
+
+    <select id="findActiveDocumentByIdAndUserIdForUpdate" resultType="com.stillwriter.document.domain.Document">
+        SELECT
+            id,
+            user_id AS userId,
+            folder_id AS folderId,
+            type,
+            title,
+            content_json::text AS contentJson,
+            plain_text AS plainText,
+            char_count AS charCount,
+            char_count_without_spaces AS charCountWithoutSpaces,
+            word_count AS wordCount,
+            sentence_count AS sentenceCount,
+            status,
+            revision,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM documents
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND deleted_at IS NULL
+        FOR UPDATE
+    </select>
+
+    <select id="existsActiveDocumentByIdAndUserId" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM documents
+            WHERE id = #{id}
+              AND user_id = #{userId}
+              AND deleted_at IS NULL
+        )
+    </select>
+
+    <update id="updateDocument">
+        UPDATE documents
+        SET title = #{title},
+            content_json = CAST(#{contentJson} AS JSONB),
+            plain_text = #{plainText},
+            char_count = #{charCount},
+            char_count_without_spaces = #{charCountWithoutSpaces},
+            word_count = #{wordCount},
+            sentence_count = #{sentenceCount},
+            revision = revision + 1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND deleted_at IS NULL
+          AND revision = #{expectedRevision}
+    </update>
+
+    <select id="existsDocumentVersionRequest" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM document_versions
+            WHERE document_id = #{documentId}
+              AND save_request_id = #{saveRequestId}
+        )
+    </select>
+
+    <select id="findNextDocumentVersionNo" resultType="int">
+        SELECT COALESCE(MAX(version_no), 0) + 1
+        FROM document_versions
+        WHERE document_id = #{documentId}
+    </select>
+
+    <insert id="insertDocumentVersion">
+        INSERT INTO document_versions (
+            document_id,
+            version_no,
+            save_request_id,
+            title,
+            content_json,
+            plain_text,
+            char_count,
+            version_type
+        )
+        VALUES (
+            #{documentId},
+            #{versionNo},
+            #{saveRequestId},
+            #{title},
+            CAST(#{contentJson} AS JSONB),
+            #{plainText},
+            #{charCount},
+            #{versionType}
+        )
+    </insert>
+
+    <update id="softDeleteDocument">
+        UPDATE documents
+        SET deleted_at = CURRENT_TIMESTAMP,
+            purge_after = CURRENT_TIMESTAMP + INTERVAL '30 days',
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND deleted_at IS NULL
+    </update>
+</mapper>

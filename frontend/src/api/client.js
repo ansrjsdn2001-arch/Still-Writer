@@ -1,22 +1,36 @@
-/**
- * 프론트엔드 전체에서 재사용할 API 요청 함수입니다.
- * VITE_API_BASE_URL이 있으면 해당 서버로 요청하고, 없으면 현재 origin 기준 상대 경로(`/api/...`)로 요청합니다.
- */
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+const ACCESS_TOKEN_STORAGE_KEY = 'still-writer-access-token';
 
 function createApiUrl(path) {
   if (!API_BASE_URL) return path;
   return `${API_BASE_URL.replace(/\/$/, '')}${path}`;
 }
 
-export async function postJson(path, body) {
+export function readAccessToken() {
+  return window.sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+}
+
+export function saveAccessToken(accessToken) {
+  if (!accessToken) return;
+  window.sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, accessToken);
+}
+
+export function clearAccessToken() {
+  window.sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+}
+
+async function sendJsonRequest(path, { method = 'GET', body, auth = true } = {}) {
+  const headers = {};
+  const accessToken = auth ? readAccessToken() : null;
+
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+
   const response = await fetch(createApiUrl(path), {
-    method: 'POST',
+    method,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   const responseData = await response.json().catch(() => null);
@@ -33,6 +47,53 @@ export async function postJson(path, body) {
   return responseData;
 }
 
+async function refreshAccessTokenFromCookie() {
+  const response = await sendJsonRequest('/api/auth/refresh', {
+    method: 'POST',
+    body: {},
+    auth: false,
+  });
+
+  const accessToken = response?.data?.accessToken;
+  if (accessToken) saveAccessToken(accessToken);
+  return accessToken;
+}
+
+export async function requestJson(path, { method = 'GET', body, auth = true } = {}) {
+  try {
+    return await sendJsonRequest(path, { method, body, auth });
+  } catch (error) {
+    const canTryRefresh = auth && error?.response?.status === 401 && path !== '/api/auth/refresh';
+
+    if (!canTryRefresh) throw error;
+
+    try {
+      const refreshedToken = await refreshAccessTokenFromCookie();
+      if (!refreshedToken) throw error;
+      return await sendJsonRequest(path, { method, body, auth });
+    } catch {
+      clearAccessToken();
+      throw error;
+    }
+  }
+}
+
+export function getJson(path, options) {
+  return requestJson(path, { ...options, method: 'GET' });
+}
+
+export function postJson(path, body, options) {
+  return requestJson(path, { ...options, method: 'POST', body });
+}
+
+export function patchJson(path, body, options) {
+  return requestJson(path, { ...options, method: 'PATCH', body });
+}
+
+export function deleteJson(path, options) {
+  return requestJson(path, { ...options, method: 'DELETE' });
+}
+
 export function getApiErrorMessage(error, fallbackMessage = '요청 처리 중 오류가 발생했습니다.') {
   const responseData = error?.response?.data;
 
@@ -46,5 +107,9 @@ export function getApiErrorMessage(error, fallbackMessage = '요청 처리 중 �
 }
 
 export default {
+  getJson,
   postJson,
+  patchJson,
+  deleteJson,
+  requestJson,
 };

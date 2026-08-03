@@ -11,6 +11,10 @@ public class NewLocalUser {
     private final String nickname;
 
     public NewLocalUser(String email, String passwordHash, String nickname) {
+        if (passwordHash == null || passwordHash.isBlank()) {
+            throw new IllegalArgumentException("LOCAL 회원의 비밀번호 해시는 필수입니다.");
+        }
+
         this.email = email;
         this.passwordHash = passwordHash;
         this.nickname = nickname;

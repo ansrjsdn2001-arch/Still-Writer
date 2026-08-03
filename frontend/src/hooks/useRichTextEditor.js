@@ -1,9 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-/**
- * contentEditable의 본문 상태와 서식 명령을 한곳에서 관리합니다.
- * 화면 컴포넌트는 브라우저 편집 명령의 세부 구현을 알 필요가 없습니다.
- */
 export default function useRichTextEditor() {
   const editorRef = useRef(null);
   const [contentHtml, setContentHtml] = useState('');
@@ -15,15 +11,19 @@ export default function useRichTextEditor() {
     () => (includeSpaces ? plainText.length : plainText.replace(/\s/g, '').length),
     [includeSpaces, plainText],
   );
+
   const wordCount = useMemo(() => {
     const normalizedText = plainText.trim();
     return normalizedText ? normalizedText.split(/\s+/).length : 0;
   }, [plainText]);
+
   const sentenceCount = useMemo(() => {
     const normalizedText = plainText.trim();
+    if (!normalizedText) return 0;
     return normalizedText
-      ? normalizedText.split(/[.!?。！？]+/).filter((sentence) => sentence.trim()).length
-      : 0;
+      .split(/[.!?。！？]+/)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean).length;
   }, [plainText]);
 
   const syncContent = useCallback(() => {
@@ -50,6 +50,14 @@ export default function useRichTextEditor() {
     syncActiveFormats();
   }, [syncActiveFormats, syncContent]);
 
+  const setEditorContent = useCallback((html = '', text = '') => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = html;
+    }
+    setContentHtml(html);
+    setPlainText(text);
+  }, []);
+
   const insertQuotes = useCallback((openingQuote, closingQuote) => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -69,20 +77,24 @@ export default function useRichTextEditor() {
     const fragment = document.createDocumentFragment();
     const openingNode = document.createTextNode(openingQuote);
     const closingNode = document.createTextNode(closingQuote);
+
     fragment.append(openingNode, selectedContent, closingNode);
     range.insertNode(fragment);
 
     const caretRange = document.createRange();
-    if (wasCollapsed) caretRange.setStartBefore(closingNode);
-    else caretRange.setStartAfter(closingNode);
+    if (wasCollapsed) {
+      caretRange.setStartBefore(closingNode);
+    } else {
+      caretRange.setStartAfter(closingNode);
+    }
     caretRange.collapse(true);
+
     selection?.removeAllRanges();
     selection?.addRange(caretRange);
     syncContent();
   }, [syncContent]);
 
   const handlePaste = useCallback((event) => {
-    // 외부 HTML과 스크립트 유입을 막기 위해 붙여넣기는 일반 텍스트만 허용합니다.
     event.preventDefault();
     document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));
     syncContent();
@@ -98,6 +110,7 @@ export default function useRichTextEditor() {
     wordCount,
     sentenceCount,
     setIncludeSpaces,
+    setEditorContent,
     syncContent,
     syncActiveFormats,
     applyFormat,

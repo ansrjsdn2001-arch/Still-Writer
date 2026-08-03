@@ -16,7 +16,7 @@ Still Writer 데이터베이스 구조
 - Google Drive OAuth 토큰은 애플리케이션에서 암호화한 뒤 BYTEA로 저장합니다.
 - 글, 폴더, 소재는 deleted_at과 purge_after를 이용한 소프트 삭제를 적용합니다.
 - 글은 수동 저장 버튼 없이 자동 저장하며, revision으로 오래된 저장 요청을 차단합니다.
-- 현재 Supabase DB에는 V001 초기 스키마, V002 문서-외부 파일 연결 테이블, V003 이메일 인증 코드 테이블 마이그레이션을 적용한 구조를 기준으로 합니다.
+- 현재 Supabase DB에는 V001 초기 스키마, V002 문서-외부 파일 연결 테이블, V003 이메일 인증 코드 테이블, V004 OAuth 일회용 교환 코드 테이블, V005 LOCAL 비밀번호 해시 보호 트리거 마이그레이션을 적용한 구조를 기준으로 합니다.
 
 PostgreSQL 공통 규칙
 -------------------
@@ -32,7 +32,7 @@ PostgreSQL 공통 규칙
 |--------|-------------|------|----------|------|
 | id | BIGINT | O | PK, IDENTITY | 회원 고유번호 |
 | email | VARCHAR(191) | O | UNIQUE | 소문자로 정규화한 로그인 이메일 |
-| password_hash | VARCHAR(255) | X | | 소셜 전용 회원은 NULL 가능 |
+| password_hash | VARCHAR(255) | X | | 소셜 전용 회원은 NULL 가능, LOCAL 계정은 DB 트리거로 NOT NULL 강제 |
 | nickname | VARCHAR(50) | O | UNIQUE | 사용자 닉네임 |
 | profile_image_url | VARCHAR(2048) | X | | 프로필 이미지 주소 |
 | email_verified_at | TIMESTAMPTZ(6) | X | | 이메일 인증 완료 시점 |
@@ -106,6 +106,30 @@ PostgreSQL 공통 규칙
 - 인증 코드는 알파벳 대문자, 알파벳 소문자, 숫자를 섞어 6자리로 생성합니다.
 - 기본 만료 시간은 3분이며 서버 환경 변수로 조정합니다.
 - 새 인증 코드를 발송하면 같은 이메일의 기존 미검증 코드는 consumed_at을 기록해 무효화합니다.
+
+5-1. OAuth 일회용 교환 코드 테이블 (oauth_exchange_codes)
+----------------------------------------------------------
+목적:
+- Google/Kakao OAuth 콜백 성공 후 Access Token을 URL에 직접 노출하지 않기 위한 일회용 교환 코드를 저장합니다.
+- 브라우저 주소에는 짧은 수명의 code만 전달하고, 프론트가 교환 API를 호출하면 백엔드가 Access Token을 응답하고 Refresh Token은 HttpOnly 쿠키로 설정합니다.
+- 교환 코드 원문은 저장하지 않고 SHA-256 해시만 저장합니다.
+- 한 번 사용한 코드는 consumed_at을 기록해 재사용을 차단합니다.
+
+| 컬럼명 | 데이터 타입 | 필수 | 제약조건 | 설명 |
+|--------|-------------|------|----------|------|
+| id | BIGINT | O | PK, IDENTITY | OAuth 교환 코드 고유번호 |
+| code_hash | CHAR(64) | O | UNIQUE | 일회용 교환 코드 SHA-256 해시 |
+| user_id | BIGINT | O | FK -> users.id | 교환 코드 소유 회원 |
+| provider | VARCHAR(20) | O | CHECK | GOOGLE, KAKAO |
+| expires_at | TIMESTAMPTZ(6) | O | CHECK | 교환 코드 만료 시점 |
+| consumed_at | TIMESTAMPTZ(6) | X | | 교환 코드 사용 시점 |
+| created_at | TIMESTAMPTZ(6) | O | DEFAULT CURRENT_TIMESTAMP | 교환 코드 생성 시점 |
+
+운영 규칙:
+- 기본 만료 시간은 120초이며 서버 환경 변수로 조정합니다.
+- OAuth 콜백 URL에는 Access Token, Refresh Token, 사용자 전체 객체를 포함하지 않습니다.
+- code_hash는 UNIQUE로 관리해 같은 교환 코드가 중복 저장되지 않게 합니다.
+- 만료되었거나 이미 consumed_at이 있는 코드는 교환할 수 없습니다.
 
 6. 사용자 설정 테이블 (user_settings)
 ---------------------------------------
@@ -374,6 +398,7 @@ PostgreSQL 공통 규칙
 | auth_identities | user_id | users.id | ON DELETE CASCADE |
 | user_sessions | user_id | users.id | ON DELETE CASCADE |
 | password_reset_tokens | user_id | users.id | ON DELETE CASCADE |
+| oauth_exchange_codes | user_id | users.id | ON DELETE CASCADE |
 | user_settings | user_id | users.id | ON DELETE CASCADE |
 | external_storage_accounts | user_id | users.id | ON DELETE CASCADE |
 | folders | user_id | users.id | ON DELETE CASCADE |
@@ -417,11 +442,14 @@ PostgreSQL 공통 규칙
 - auth_identities(user_id, provider) UNIQUE
 - user_sessions(refresh_token_hash) UNIQUE
 - user_sessions(user_id, expires_at)
+- user_sessions(user_id, expires_at) WHERE revoked_at IS NULL
 - password_reset_tokens(token_hash) UNIQUE
 - password_reset_tokens(user_id, expires_at)
 - email_verification_codes(email, purpose, created_at DESC)
 - email_verification_codes(email, purpose, code_hash, expires_at) WHERE verified_at IS NULL AND consumed_at IS NULL
 - email_verification_codes(expires_at) WHERE verified_at IS NULL AND consumed_at IS NULL
+- oauth_exchange_codes(code_hash) UNIQUE
+- oauth_exchange_codes(expires_at) WHERE consumed_at IS NULL
 - external_storage_accounts(user_id, provider, provider_account_id) UNIQUE
 - folders(user_id, last_used_at DESC) WHERE deleted_at IS NULL
 - folders(user_id, parent_id, sort_order) WHERE deleted_at IS NULL
@@ -458,7 +486,9 @@ PostgreSQL 공통 규칙
 인증·소유권 정책
 ----------------
 - LOCAL 비밀번호는 단방향 해시로 저장하고 GOOGLE·KAKAO 계정은 auth_identities로 연결합니다.
+- LOCAL auth_identities를 생성하거나 LOCAL 회원의 password_hash를 NULL로 변경하려는 경우 DB 트리거가 차단합니다.
 - Refresh Token 원문은 저장하지 않고 해시만 user_sessions에 저장합니다.
+- OAuth 로그인 성공 URL에는 Access Token을 직접 포함하지 않고 oauth_exchange_codes의 일회용 교환 코드만 전달합니다.
 - 로그아웃, 비밀번호 변경, 회원 탈퇴 시 관련 세션을 폐기합니다.
 - 모든 사용자 데이터 조회·변경 SQL은 인증 user_id와 소프트 삭제 조건을 포함합니다.
 - 연결 테이블 등록 전 글·태그·소재가 모두 같은 사용자의 소유인지 Service에서 검증합니다.

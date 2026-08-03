@@ -30,15 +30,20 @@
         )
     </insert>
 
-    <update id="increaseAttemptCount">
+    <update id="increaseLatestAttemptCount">
         UPDATE email_verification_codes
         SET attempt_count = attempt_count + 1
-        WHERE email = #{email}
-          AND purpose = #{purpose}
-          AND verified_at IS NULL
-          AND consumed_at IS NULL
-          AND expires_at > CURRENT_TIMESTAMP
-          AND attempt_count &lt; 10
+        WHERE id = (
+            SELECT id
+            FROM email_verification_codes
+            WHERE email = #{email}
+              AND purpose = #{purpose}
+              AND verified_at IS NULL
+              AND consumed_at IS NULL
+              AND attempt_count &lt; #{maxAttempts}
+            ORDER BY created_at DESC
+            LIMIT 1
+        )
     </update>
 
     <select id="findValidCodeId" resultType="long">
@@ -50,7 +55,7 @@
           AND verified_at IS NULL
           AND consumed_at IS NULL
           AND expires_at > CURRENT_TIMESTAMP
-          AND attempt_count &lt;= 10
+          AND attempt_count &lt;= #{maxAttempts}
         ORDER BY created_at DESC
         LIMIT 1
     </select>

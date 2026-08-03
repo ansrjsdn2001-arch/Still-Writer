@@ -129,6 +129,17 @@
           AND ai.provider_user_id = #{providerUserId}
     </select>
 
+    <select id="findLoginUserById" resultType="com.stillwriter.auth.domain.LoginUser">
+        SELECT
+            id,
+            email,
+            password_hash AS passwordHash,
+            nickname,
+            status
+        FROM users
+        WHERE id = #{userId}
+    </select>
+
     <insert id="insertUserSession"
             parameterType="com.stillwriter.auth.domain.NewUserSession"
             useGeneratedKeys="true"
@@ -151,6 +162,79 @@
             #{expiresAt}
         )
     </insert>
+
+    <select id="findUserSessionByRefreshTokenHash" resultType="com.stillwriter.auth.domain.UserSession">
+        SELECT
+            id,
+            user_id AS userId,
+            refresh_token_hash AS refreshTokenHash,
+            expires_at AS expiresAt,
+            revoked_at AS revokedAt
+        FROM user_sessions
+        WHERE refresh_token_hash = #{refreshTokenHash}
+    </select>
+
+    <update id="rotateRefreshToken">
+        UPDATE user_sessions
+        SET refresh_token_hash = #{newRefreshTokenHash},
+            expires_at = #{expiresAt}
+        WHERE id = #{sessionId}
+          AND refresh_token_hash = #{oldRefreshTokenHash}
+          AND revoked_at IS NULL
+          AND expires_at > CURRENT_TIMESTAMP
+    </update>
+
+    <update id="revokeUserSessionByRefreshTokenHash">
+        UPDATE user_sessions
+        SET revoked_at = #{revokedAt}
+        WHERE refresh_token_hash = #{refreshTokenHash}
+          AND revoked_at IS NULL
+    </update>
+
+    <update id="revokeAllUserSessions">
+        UPDATE user_sessions
+        SET revoked_at = #{revokedAt}
+        WHERE user_id = #{userId}
+          AND revoked_at IS NULL
+    </update>
+
+    <insert id="insertOAuthExchangeCode"
+            parameterType="com.stillwriter.auth.domain.NewOAuthExchangeCode"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO oauth_exchange_codes (
+            code_hash,
+            user_id,
+            provider,
+            expires_at
+        )
+        VALUES (
+            #{codeHash},
+            #{userId},
+            #{provider},
+            #{expiresAt}
+        )
+    </insert>
+
+    <select id="findOAuthExchangeCodeByHash" resultType="com.stillwriter.auth.domain.OAuthExchangeCode">
+        SELECT
+            id,
+            user_id AS userId,
+            provider,
+            expires_at AS expiresAt,
+            consumed_at AS consumedAt
+        FROM oauth_exchange_codes
+        WHERE code_hash = #{codeHash}
+    </select>
+
+    <update id="consumeOAuthExchangeCode">
+        UPDATE oauth_exchange_codes
+        SET consumed_at = #{consumedAt}
+        WHERE id = #{id}
+          AND consumed_at IS NULL
+          AND expires_at > CURRENT_TIMESTAMP
+    </update>
 
     <update id="updateLastLoginAt">
         UPDATE users

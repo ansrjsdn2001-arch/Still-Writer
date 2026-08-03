@@ -1,6 +1,8 @@
 import CollectionsBookmarkOutlinedIcon from '@mui/icons-material/CollectionsBookmarkOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import ViewListOutlinedIcon from '@mui/icons-material/ViewListOutlined';
@@ -9,6 +11,8 @@ import ViewListOutlinedIcon from '@mui/icons-material/ViewListOutlined';
 export const primaryNavigationItems = [
   { id: 'home', label: '홈', Icon: HomeOutlinedIcon },
   { id: 'all', label: '모든 글', Icon: ViewListOutlinedIcon },
+  { id: 'search', label: '검색', Icon: SearchRoundedIcon },
+  { id: 'folders', label: '내 폴더', Icon: FolderOutlinedIcon },
   { id: 'materials', label: '소재 보관함', Icon: CollectionsBookmarkOutlinedIcon },
   { id: 'favorites', label: '즐겨찾기', Icon: StarBorderOutlinedIcon },
   { id: 'trash', label: '휴지통', Icon: DeleteOutlineOutlinedIcon },

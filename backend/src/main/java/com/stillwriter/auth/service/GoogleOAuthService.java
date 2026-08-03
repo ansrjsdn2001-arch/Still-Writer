@@ -107,15 +107,20 @@ public class GoogleOAuthService {
 
     @Transactional
     public LoginResult loginWithAuthorizationCode(String code, String ipAddress, String userAgent) {
-        OAuthTokenResponse tokenResponse = exchangeAuthorizationCode(code);
-        GoogleUserInfo userInfo = fetchUserInfo(tokenResponse.accessToken());
-        LoginUser user = findOrCreateUser(userInfo);
+        LoginUser user = authenticateAuthorizationCode(code);
 
         if (!"ACTIVE".equals(user.getStatus())) {
             throw new UnauthorizedException("로그인할 수 없는 계정입니다.");
         }
 
         return issueLoginResult(user, ipAddress, userAgent);
+    }
+
+    @Transactional
+    public LoginUser authenticateAuthorizationCode(String code) {
+        OAuthTokenResponse tokenResponse = exchangeAuthorizationCode(code);
+        GoogleUserInfo userInfo = fetchUserInfo(tokenResponse.accessToken());
+        return findOrCreateUser(userInfo);
     }
 
     private OAuthTokenResponse exchangeAuthorizationCode(String code) {

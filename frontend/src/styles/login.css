@@ -12,16 +12,24 @@
 
 .login-page {
   --login-background: var(--login-background-light);
+  --login-page-background-color: var(--color-bg-light);
+  --login-layout-background-color: #fffefa;
+  --login-overlay: linear-gradient(135deg, rgba(246, 241, 231, 0.3) 0%, rgba(255, 254, 250, 0.12) 52%, rgba(44, 42, 39, 0.08) 100%);
+  --login-mobile-overlay: linear-gradient(180deg, rgba(246, 241, 231, 0.2) 0%, rgba(255, 254, 250, 0.08) 52%, rgba(44, 42, 39, 0.12) 100%);
   width: 100%;
   min-height: 100dvh;
   padding: 72px 0 0;
   color: var(--color-text-light);
-  background: var(--color-bg-light);
+  background: var(--login-page-background-color);
 }
 
-/* 앱 테마가 다크 모드일 때 로그인 화면 전용 이미지만 교체합니다. */
+/* 앱 테마가 다크 모드일 때 로그인/회원가입 화면의 배경 이미지와 오버레이를 함께 교체합니다. */
 [data-theme="dark"] .login-page {
   --login-background: var(--login-background-dark);
+  --login-page-background-color: var(--color-bg-dark);
+  --login-layout-background-color: var(--color-bg-dark);
+  --login-overlay: linear-gradient(135deg, rgba(37, 38, 40, 0.36) 0%, rgba(37, 38, 40, 0.14) 52%, rgba(0, 0, 0, 0.22) 100%);
+  --login-mobile-overlay: linear-gradient(180deg, rgba(37, 38, 40, 0.28) 0%, rgba(37, 38, 40, 0.1) 52%, rgba(0, 0, 0, 0.26) 100%);
 }
 
 .login-panel a { color: #33722e; font-weight: 700; text-decoration: none; }
@@ -34,10 +42,10 @@
   place-items: center;
   padding: 32px;
   overflow: hidden;
-  background-color: #fffefa;
+  background-color: var(--login-layout-background-color);
   /* 사진 위에 따뜻한 반투명 막을 겹쳐 입력 폼이 배경에 묻히지 않도록 합니다. */
   background-image:
-    linear-gradient(135deg, rgba(246, 241, 231, 0.3) 0%, rgba(255, 254, 250, 0.12) 52%, rgba(44, 42, 39, 0.08) 100%),
+    var(--login-overlay),
     var(--login-background);
   background-repeat: no-repeat;
   /* 원본 비율을 유지한 cover 방식으로 화면을 빈틈없이 채웁니다. */
@@ -315,10 +323,10 @@
     min-height: 100dvh;
     padding: 64px 0 0;
     overflow-x: hidden;
-    background-color: #fffefa;
+    background-color: var(--login-layout-background-color);
     /* 모바일에서는 세로 화면에 맞는 오버레이와 초점 위치를 따로 사용합니다. */
     background-image:
-      linear-gradient(180deg, rgba(246, 241, 231, 0.2) 0%, rgba(255, 254, 250, 0.08) 52%, rgba(44, 42, 39, 0.12) 100%),
+      var(--login-mobile-overlay),
       var(--login-background);
     background-repeat: no-repeat;
     background-position: center, 53% center;

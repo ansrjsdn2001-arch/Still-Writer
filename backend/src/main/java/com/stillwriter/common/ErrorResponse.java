@@ -15,11 +15,11 @@ public record ErrorResponse(
         boolean success,
         String message,
         Map<String, String> errors,
-        Instant timestamp
+    Instant timestamp
 ) {
 
     public static ErrorResponse of(String message) {
-        return new ErrorResponse(false, message, Map.of(), Instant.now());
+        return new ErrorResponse(false, message, null, Instant.now());
     }
 
     public static ErrorResponse of(String message, Map<String, String> errors) {

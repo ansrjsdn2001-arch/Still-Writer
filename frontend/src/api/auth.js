@@ -14,6 +14,22 @@ export function startGoogleLogin() {
   window.location.href = createOAuthApiUrl('/api/auth/oauth/google/authorize');
 }
 
+export function startKakaoLogin() {
+  window.location.href = createOAuthApiUrl('/api/auth/oauth/kakao/authorize');
+}
+
+export async function refreshAccessToken() {
+  return postJson('/api/auth/refresh', {});
+}
+
+export async function logout() {
+  return postJson('/api/auth/logout', {});
+}
+
+export async function exchangeOAuthCode(code) {
+  return postJson('/api/auth/oauth/exchange', { code });
+}
+
 export async function sendEmailVerification(email) {
   return postJson('/api/auth/email-verification/send', { email });
 }
